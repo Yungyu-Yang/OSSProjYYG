@@ -114,8 +114,8 @@ const Sidebar = () => {
         <div className="flex justify-center p-3">
           <button
             className="flex items-center justify-center p-2 w-12 h-12 bg-gray-700 rounded-full"
-            aria-expanded={isDropdownOpen ? "true" : "false"}
-            onClick={toggleDropdown} // 버튼 클릭 시 드롭다운 토글
+            role="button"
+            onClick={toggleDropdown}
           >
             <img
               src="https://github.com/mdo.png"
