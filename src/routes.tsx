@@ -8,6 +8,7 @@ import Chat from "./pages/Chat";
 import Calendar from "./pages/Calendar";
 import Mypage from "./pages/Mypage";
 import Avatar from "./pages/Avatar";
+import EditProfile from "./pages/EditProfile";
 
 const AppRoutes = () => (
   <Routes>
@@ -19,6 +20,7 @@ const AppRoutes = () => (
     <Route path="/calendar" element={<Calendar />} />
     <Route path="/mypage" element={<Mypage />} />
     <Route path="/avatar" element={<Avatar />} />
+    <Route path="/editprofile" element={<EditProfile />} />
   </Routes>
 );
 

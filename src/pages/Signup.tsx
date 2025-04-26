@@ -14,6 +14,7 @@ import logo from '../assets/logo.png';
 export default function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isNameAvailable, setIsNameAvailable] = useState<null | boolean>(null);
   const [isEmailAvailable, setIsEmailAvailable] = useState<null | boolean>(null);
   const [loading, setLoading] = useState(false); // 로딩 상태
@@ -116,8 +117,9 @@ export default function SignUp() {
           <input
             id="password"
             type="password"
-            value="password"
-            className="w-full rounded-lg border p-2 shadow-sm mb-5"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full rounded-lg border p-2 shadow-sm mb-10"
           />
         </div>
 
