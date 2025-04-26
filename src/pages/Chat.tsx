@@ -5,7 +5,7 @@
 //       </div>
       // components/ChatPage.jsx
 import { useState } from "react";
-import { FaRegSmile, FaUser, FaHome, FaComments, FaCalendar } from "react-icons/fa";
+import Sidebar from "../components/Sidebar";
 import { PiMicrophoneBold } from "react-icons/pi";
 
 const Chat = () => {
@@ -13,15 +13,7 @@ const Chat = () => {
 
   return (
     <div className="flex h-screen bg-[#FFF9F5] text-[#333]">
-      {/* Sidebar */}
-      {/* <aside className="w-20 bg-[#FFEFEA] flex flex-col items-center py-6 space-y-6">
-        <img src="/logo.png" alt="MindTune Logo" className="w-10 h-10 mb-4" />
-        <FaHome className="text-[#F4B8A7] w-6 h-6" />
-        <FaComments className="text-[#F4B8A7] w-6 h-6" />
-        <FaCalendar className="text-[#F4B8A7] w-6 h-6" />
-        <FaRegSmile className="text-[#F4B8A7] w-6 h-6" />
-        <FaUser className="text-[#F4B8A7] w-6 h-6" />
-      </aside> */}
+      
 
       {/* Main Chat Area */}
       <main className="flex flex-col flex-1 p-8 space-y-6 overflow-y-auto">
