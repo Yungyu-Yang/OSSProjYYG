@@ -39,7 +39,7 @@ export default function SignIn() {
           <input
             id="password"
             type="password"
-            className="w-full rounded-lg border p-2 shadow-sm mb-5"
+            className="w-full rounded-lg border p-2 shadow-sm mb-10"
           />
         </div>
 
