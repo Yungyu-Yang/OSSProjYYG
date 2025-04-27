@@ -1,30 +1,29 @@
-// const Chat = () => {
-//     return (
-//       <div className="text-center text-2xl mt-10">
-//         🚀 Chat Page입니다!
-//       </div>
-      // components/ChatPage.jsx
 import { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import { PiMicrophoneBold } from "react-icons/pi";
+import { PiMicrophoneBold, PiArrowRight } from "react-icons/pi";
+import avatar from '../assets/avatar/avatar1.png';
 
 const Chat = () => {
   const [userInput, setUserInput] = useState("");
 
   return (
-    <div className="flex h-screen bg-[#FFF9F5] text-[#333]">
+    <div className="flex h-screen bg-[#FFFDF8] text-[#333]">
       
-
       {/* Main Chat Area */}
       <main className="flex flex-col flex-1 p-8 space-y-6 overflow-y-auto">
         {/* Chat messages */}
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">🤖</div>
+        <div className="space-y-4 m-5 bg-[#F9F7F2] p-8">
+        <div className="flex items-start space-x-3">
+          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+            <img src={avatar} alt="Avatar" className="object-cover" />
+          </div>
+          
+          <div className="flex flex-col">
+            <div>맴미</div>
             <div className="bg-white p-4 rounded-xl shadow-sm max-w-lg">
               <p>어서와멤! 오늘 하루는 어땠는지 궁금하멤!</p>
             </div>
           </div>
+        </div>
 
           <div className="flex justify-end">
             <div className="bg-[#FFE0D2] p-4 rounded-xl shadow-sm max-w-lg">
@@ -38,7 +37,12 @@ const Chat = () => {
           </div>
 
           <div className="flex items-start space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">🤖</div>
+          <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+            <img src={avatar} alt="Avatar" className="object-cover" />
+          </div>
+          
+          <div className="flex flex-col">
+            <div>맴미</div>
             <div className="bg-white p-4 rounded-xl shadow-sm max-w-lg">
               <p>
                 그랬구멤! 너의 오늘 하루는<br />
@@ -47,34 +51,52 @@ const Chat = () => {
               </p>
             </div>
           </div>
+        </div>
 
-          <div className="flex justify-end space-x-2">
-            <button className="bg-[#FFE0D2] text-sm px-4 py-2 rounded-xl shadow-sm">좋아, 만들어줘!</button>
-            <button className="bg-[#FFE0D2] text-sm px-4 py-2 rounded-xl shadow-sm">다른 게 좋을 것 같아.</button>
+          <div className="flex flex-col items-center space-y-2 bg-[#FFE0D2] p-4 rounded-xl max-w-[300px] ml-auto mb-24">
+            <button className="bg-[#FFFDF8] text-sm px-4 py-2 rounded-xl shadow-sm max-w-[200px] w-full">
+              좋아, 만들어줘!
+            </button>
+            <button className="bg-[#FFFDF8] text-sm px-4 py-2 rounded-xl shadow-sm max-w-[200px] w-full">
+              다른 게 좋을 것 같아.
+            </button>
+          </div>
+
+
+
+
+          {/* Input area */}
+          <div className="flex justify-center items-center mt-24 space-x-2 w-full">
+            <div className="flex items-center space-x-2 w-full max-w-[800px]">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                className="w-full rounded-full px-4 py-2 pr-12 bg-[#FFE8D6] placeholder-white"
+                placeholder="오늘 하루 어땠어?"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+              />
+              <button
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#7C6F62]" // 위치 조정
+              >
+                <PiArrowRight size={22} />
+              </button>
+            </div>
+
+              <button 
+                className="bg-[#FFE0D2] p-2 rounded-full shadow-sm"
+                title="음성 입력"
+              >
+                <PiMicrophoneBold className="text-red-500 w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Input area */}
-        <div className="flex items-center mt-auto space-x-2">
-          <input
-            type="text"
-            className="flex-1 rounded-full px-4 py-2 border border-gray-300 shadow-sm"
-            placeholder="오늘 하루 어땠어?"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-          />
-          <button 
-            className="bg-[#FFE0D2] p-2 rounded-full shadow-sm"
-            title="음성 입력"
-          >
-            <PiMicrophoneBold className="text-red-500 w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Music placeholder */}
-        <div className="mt-8 bg-[#FFE0D2] p-8 rounded-3xl text-center shadow-md">
+        <div className="flex justify-center items-center mt-8 bg-[#FFE8D6] bg-opacity-70 p-8 rounded-3xl text-center shadow-md w-full max-w-[1000px] mx-auto">
           <p className="text-lg">아직 생성된 음악이 없어요.<br />맴미와 오늘 일상을 공유하고 만들어보세요!</p>
         </div>
+
       </main>
     </div>
   );

@@ -3,8 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { PiHouseBold, PiChatCircleBold, PiDresserBold, PiSmileyBold, PiUserBold } from 'react-icons/pi';
 import logo from '../assets/logo.png';
 import avatar from '../assets/avatar/avatar1.png';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = () => {
+
+  const navigate = useNavigate();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -68,7 +71,7 @@ const Sidebar = () => {
 
         {isDropdownOpen && (
           <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-md shadow-md px-3 py-2 z-10">
-            <button className="text-sm hover:underline">
+            <button onClick={() => navigate('/')} className="text-sm hover:underline">
               Logout
             </button>
           </div>

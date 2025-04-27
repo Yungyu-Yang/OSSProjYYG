@@ -1,17 +1,10 @@
-// const Signup = () => {
-//     return (
-//       <div className="text-center text-2xl mt-10">
-//         🚀 SignUp Page입니다!
-//       </div>
-//     );
-// };
-  
-// export default Signup;
-
 import React, { useState } from 'react';
 import logo from '../assets/logo.png';
+import { useNavigate } from 'react-router-dom';
 
 export default function SignUp() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -125,7 +118,7 @@ export default function SignUp() {
 
         {/* 제출 */}
         <div className="flex justify-center">
-          <button className="mb-1 bg-[#ffb3ab] text-white px-20 py-2 rounded-lg font-semibold">
+          <button onClick={() => navigate('/home')} className="mb-1 bg-[#ffb3ab] hover:bg-[#FF99A6] text-white px-20 py-2 rounded-lg font-semibold">
             Sign Up</button>
         </div>
 
