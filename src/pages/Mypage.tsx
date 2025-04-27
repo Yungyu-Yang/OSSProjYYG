@@ -1,12 +1,16 @@
-import React from 'react';
+import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import avatar from '../assets/avatar/avatar1.png';
 
 export default function MyPage() {
   const navigate = useNavigate();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const handleWithdraw = () => {
+    navigate('/'); // '/'로 이동
+  };
 
   return (
-    <div className="flex justify-center bg-[#fefcf7] pt-[50px] min-h-screen">
+    <div className="flex justify-center bg-[#fffdf8] pt-[50px] min-h-screen">
       {/* Main Content */}
       <div className="flex-1 p-8 max-w-[900px] w-full ml-[50px]">
         <div className="flex items-center mb-8 w-full max-w-[700px]">
@@ -37,11 +41,45 @@ export default function MyPage() {
               아바타 수정
           </button>
           <button 
-            onClick={() => navigate('/')} 
+            onClick={() => setIsPopupOpen(true)}
             className="w-full max-w-[750px] flex justify-between items-center border-b border-[#9C9C9C] py-4 text-[#4A3F35] p-3">
               탈퇴하기
           </button>
         </div>
+
+
+        {/* 팝업창 */}
+        {isPopupOpen && (
+          <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-40 z-50">
+            <div className="bg-[#FFE8D6] p-8 rounded-2xl shadow-md w-[90%] max-w-md text-center relative">
+              {/* 이미지 */}
+              <img 
+                src={avatar} 
+                alt="Avatar" 
+                className="w-24 h-24 rounded-full bg-[#DDDBD5] bg-opacity-80 object-cover mx-auto mb-6" 
+              />
+
+              {/* 문구 */}
+              <p className="text-xl font-semibold mb-8">정말 탈퇴하시겠습니까?</p>
+
+              {/* 버튼들 */}
+              <div className="flex justify-center space-x-4">
+                <button 
+                  className="bg-[#FFB3AB] text-white px-6 py-2 rounded"
+                  onClick={handleWithdraw}
+                >
+                  탈퇴하기
+                </button>
+                <button 
+                  className="bg-[#FFFDF8] text-[#7C6F62] px-6 py-2 rounded"
+                  onClick={() => setIsPopupOpen(false)}
+                >
+                  뒤로가기
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-center mt-12 text-center">
           <div className="flex items-center justify-between w-full max-w-[100px]">
