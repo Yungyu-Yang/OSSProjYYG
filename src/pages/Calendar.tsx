@@ -6,6 +6,25 @@ import avatar from '../assets/avatar/avatar1.png';
 import avatar2 from '../assets/avatar/avatar2.png'; 
 import { PiXCircle } from 'react-icons/pi';
 
+// FullCalendar 스타일 커스터마이징
+const calendarStyles = `
+  .fc-button-primary {
+    background-color: #FFB3AB !important;
+    border-color: #FFB3AB !important;
+    color: white !important;
+  }
+  
+  .fc-button-primary:hover {
+    background-color: #ff9c92 !important;
+    border-color: #ff9c92 !important;
+  }
+  
+  .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: #ff8a7d !important;
+    border-color: #ff8a7d !important;
+  }
+`;
+
 const Calendar = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 팝업 창 상태 관리
   const [selectedDate, setSelectedDate] = useState<string>(''); // 선택된 날짜 상태 관리
@@ -70,6 +89,7 @@ const Calendar = () => {
 
   return (
     <div className="p-[30px] min-h-screen bg-[#FFFDF8] max-h-screen">
+      <style>{calendarStyles}</style>
       <div className="flex items-center">
         <img src={avatar} alt="Avatar" className="w-16 h-16 rounded-full bg-[#DDDBD5] bg-opacity-80 object-cover ml-5" />
         <p className="ml-4 bg-[#FFF1E6] rounded-xl p-[13px]"> 어떤 기억을 찾으러 왔어??</p>
@@ -84,6 +104,11 @@ const Calendar = () => {
             events={events} // 이벤트 전달
             eventContent={eventContent} // 이벤트 콘텐츠 커스터마이징
             dateClick={handleDateClick} // 올바르게 dateClick 이벤트 핸들러 추가
+            headerToolbar={{
+              left: "title",
+              // center: "title",
+              right: "today prev,next"
+            }}
           />
         </div>
       </div>
@@ -175,7 +200,7 @@ const Calendar = () => {
             
           </div>
   
-          <div className="flex justify-center items-center mt-8 bg-[#FFB3AB] bg-opacity-70 p-8 rounded-3xl text-center shadow-md w-full max-w-[1000px] mx-auto">
+          <div className="flex justify-center items-center mt-8 bg-[#FFB3AB] bg-opacity-70 p-8 rounded-3xl text-center shadow-md w-full max-w-[800px] mx-auto">
             <p className="text-lg">음악 생성 창</p>
           </div>
   
