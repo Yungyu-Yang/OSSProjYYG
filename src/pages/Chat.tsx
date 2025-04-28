@@ -87,13 +87,13 @@ const Chat = () => {
                 className="bg-[#FFE0D2] p-2 rounded-full shadow-sm"
                 title="음성 입력"
               >
-                <PiMicrophoneBold className="text-red-500 w-5 h-5" />
+                <PiMicrophoneBold className="text-[#7C6F62] w-5 h-5" />
               </button>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-center items-center mt-8 bg-[#FFE8D6] bg-opacity-70 p-8 rounded-3xl text-center shadow-md w-full max-w-[1000px] mx-auto">
+        <div className="flex justify-center items-center mt-8 bg-[#FFE8D6] bg-opacity-70 p-8 rounded-3xl text-center shadow-md w-full max-w-[800px] mx-auto">
           <p className="text-lg">아직 생성된 음악이 없어요.<br />맴미와 오늘 일상을 공유하고 만들어보세요!</p>
         </div>
 
