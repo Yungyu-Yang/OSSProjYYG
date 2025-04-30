@@ -20,7 +20,7 @@ const Chat = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(180); // 3분 길이의 곡으로 가정
+  const [duration, setDuration] = useState(0); // 3분 길이의 곡으로 가정
 
   // 음악 재생 중일 때, 시간을 1초씩 증가
   useEffect(() => {
@@ -39,7 +39,7 @@ const Chat = () => {
     return () => clearInterval(timer);
   }, [isPlaying, currentTime, duration]);
 
-  // 음악 생성 함수수
+  // 음악 생성 함수
   const handleGenerateMusic = () => {
     setIsGenerating(true);    // 음악 생성 중 상태로 변경
     setTimeout(() => {
@@ -63,7 +63,7 @@ const Chat = () => {
     setIsPlaying(!isPlaying);
   };
 
-  // 10초 뒤로 이동동
+  // 10초 뒤로 이동
   const handleSkipForward = () => {
     setCurrentTime(Math.min(currentTime + 10, duration));
   };
@@ -164,7 +164,14 @@ const Chat = () => {
         </div>
 
         {/* 음악 영역 */}
-        <div className="flex justify-center items-center mt-8 bg-[#FFE8D6] bg-opacity-70 p-8 rounded-3xl text-center shadow-md w-full max-w-[800px] mx-auto">
+        <div
+          className={`flex justify-center items-center mt-8 ${
+            isGenerating
+              ? "bg-[#FFE8D6] bg-opacity-70"
+              : duration > 0
+              ? "bg-[#FFB3AB] bg-opacity-70"
+              : "bg-[#FFE8D6] bg-opacity-70"
+          } p-8 rounded-3xl text-center shadow-md w-full max-w-[800px] mx-auto`}>
           {isGenerating ? (
             <div className="w-full">
               <p className="text-lg mb-4">음악을 만드는 중이에요...</p>
@@ -174,39 +181,40 @@ const Chat = () => {
             </div>
           ) : duration > 0 ? (
             <div className="w-full">
-              <h3 className="text-xl font-semibold mb-2">봄날의 산책</h3>
-              <div className="flex items-center justify-center space-x-4 mb-4">
+              <h3 className="text-xl font-semibold mb-5">봄날의 산책</h3>
+              
+              <div className="w-full bg-[#FFE8D6] bg-opacity-90 h-2 rounded-full overflow-hidden mt-2 mb-2">
+                <div 
+                  className="bg-[#7C6F62] h-full transition-all duration-300"
+                  style={{ width: `${(currentTime / duration) * 100}%` }}
+                ></div>
+              </div>
+              <div className="flex items-center justify-between text-sm text-[#7C6F62]">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+              <div className="flex items-center justify-center space-x-4 mt-4">
                 <button 
                   onClick={handleSkipBackward}
-                  className="text-[#7C6F62] hover:text-[#FFB3AB] transition-colors"
+                  className="text-black hover:text-[#7C6F62] transition-colors"
                   title="10초 뒤로"
                 >
                   <PiSkipBack size={24} />
                 </button>
                 <button 
                   onClick={handlePlayPause}
-                  className="text-[#7C6F62] hover:text-[#FFB3AB] transition-colors"
+                  className="text-black hover:text-[#7C6F62] transition-colors"
                   title={isPlaying ? "일시정지" : "재생"}
                 >
                   {isPlaying ? <PiPause size={32} /> : <PiPlay size={32} />}
                 </button>
                 <button 
                   onClick={handleSkipForward}
-                  className="text-[#7C6F62] hover:text-[#FFB3AB] transition-colors"
+                  className="text-black hover:text-[#7C6F62] transition-colors"
                   title="10초 앞으로"
                 >
                   <PiSkipForward size={24} />
                 </button>
-              </div>
-              <div className="flex items-center justify-between text-sm text-[#7C6F62]">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
-              <div className="w-full bg-[#FFB3AB] bg-opacity-30 h-2 rounded-full overflow-hidden mt-2">
-                <div 
-                  className="bg-[#FFB3AB] h-full transition-all duration-300"
-                  style={{ width: `${(currentTime / duration) * 100}%` }}
-                ></div>
               </div>
             </div>
           ) : (
