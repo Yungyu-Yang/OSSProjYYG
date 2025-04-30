@@ -2,12 +2,15 @@ package com.skycastle.mindtune.controller;
 
 import com.skycastle.mindtune.auth.JwtTokenProvider;
 import com.skycastle.mindtune.dto.UserLoginRequestDTO;
+import com.skycastle.mindtune.dto.UserMypageResponseDTO;
 import com.skycastle.mindtune.dto.UserSignupRequestDTO;
 import com.skycastle.mindtune.reponse.BaseResponse;
 import com.skycastle.mindtune.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -19,6 +22,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserSignupRequestDTO request) {
@@ -52,21 +56,44 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody UserLoginRequestDTO request) {
-        // 로그인 시 사용자 정보와 함께 JWT 토큰을 생성
-        Long uno = userService.login(request);
-        String token = JwtTokenProvider.createToken(uno);
 
-        // 응답 본문에 필요한 정보와 토큰 추가
+        Long uno = userService.login(request);
+        String token = jwtTokenProvider.createToken(uno);
+
         Map<String, Object> body = new HashMap<>();
         body.put("uno", uno);
 
-        // 응답 헤더에 Authorization 추가
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + token);
+        headers.add("Authorization", token);
 
-        // 응답 반환
         BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "로그인에 성공하였습니다.", body);
         return ResponseEntity.ok().headers(headers).body(response);
     }
+
+    @GetMapping("/mypage")
+    public ResponseEntity<?> getMypage(@RequestHeader("Authorization") String token) {
+
+        String jwtToken = token.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserMypageResponseDTO mypageInfo = userService.getMypage(uno);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("uno", mypageInfo.getUno());
+        body.put("name", mypageInfo.getName());
+        body.put("email", mypageInfo.getEmail());
+        body.put("ano", mypageInfo.getAno());
+        body.put("anoImg", mypageInfo.getAnoImg());
+        body.put("attend", mypageInfo.getAttend());
+
+        BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "마이페이지 정보 조회에 성공하였습니다.", body);
+        return ResponseEntity.ok(response);
+    }
+
 
 }
