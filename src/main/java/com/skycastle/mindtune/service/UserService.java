@@ -1,10 +1,16 @@
 package com.skycastle.mindtune.service;
 
-import com.skycastle.mindtune.auth.JwtTokenProvider;
 import com.skycastle.mindtune.dto.UserLoginRequestDTO;
+import com.skycastle.mindtune.dto.UserMypageResponseDTO;
 import com.skycastle.mindtune.dto.UserSignupRequestDTO;
+import com.skycastle.mindtune.entity.UserAvaEntity;
+import com.skycastle.mindtune.entity.UserAvaLockEntity;
 import com.skycastle.mindtune.entity.UserEntity;
+import com.skycastle.mindtune.entity.AvaEntity;
+import com.skycastle.mindtune.repository.AvaRepository;
+import com.skycastle.mindtune.repository.UserAvaRepository;
 import com.skycastle.mindtune.repository.UserRepository;
+import com.skycastle.mindtune.repository.UserAvaLockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +22,9 @@ import java.time.LocalDateTime;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserAvaLockRepository userAvaLockRepository;
+    private final UserAvaRepository userAvaRepository;
+    private final AvaRepository avaRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
     public Long signup(UserSignupRequestDTO request) {
@@ -32,7 +41,31 @@ public class UserService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return userRepository.save(user).getUno();
+        user = userRepository.save(user);
+        Long uno = user.getUno();
+
+        for (long ano = 1; ano <= 10; ano++) {
+            int status = (ano == 1 || ano == 2) ? 1 : 0;
+
+            UserAvaLockEntity lock = UserAvaLockEntity.builder()
+                    .uno(uno)
+                    .ano(ano)
+                    .status(status)
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            userAvaLockRepository.save(lock);
+        }
+
+        UserAvaEntity userAva = UserAvaEntity.builder()
+                .uno(uno)
+                .ano(1L)
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        userAvaRepository.save(userAva);
+
+        return uno;
     }
 
     public boolean isEmailDuplicate(String email) {
@@ -55,5 +88,26 @@ public class UserService {
         }
 
         return user.getUno();
+    }
+
+    public UserMypageResponseDTO getMypage(Long uno) {
+
+        UserEntity userEntity = userRepository.findById(uno)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        UserAvaEntity userAvaEntity = userAvaRepository.findByUno(uno);
+
+        String imgUrl = avaRepository.findByAno(userAvaEntity.getAno())
+                .map(AvaEntity::getImg)
+                .orElse(null);
+
+        return new UserMypageResponseDTO(
+                userEntity.getUno(),
+                userEntity.getName(),
+                userEntity.getEmail(),
+                userAvaEntity.getAno(),
+                imgUrl,
+                userEntity.getAttend()
+        );
     }
 }
