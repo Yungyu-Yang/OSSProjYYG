@@ -1,6 +1,7 @@
 package com.skycastle.mindtune.controller;
 
 import com.skycastle.mindtune.auth.JwtTokenProvider;
+import com.skycastle.mindtune.dto.UserHomeRequestDTO;
 import com.skycastle.mindtune.dto.UserLoginRequestDTO;
 import com.skycastle.mindtune.dto.UserMypageResponseDTO;
 import com.skycastle.mindtune.dto.UserSignupRequestDTO;
@@ -95,5 +96,24 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/home")
+    public ResponseEntity<?> getHome(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", "");
 
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserHomeRequestDTO getHomeInfo = userService.getHome(uno);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("uno", getHomeInfo.getUno());
+        body.put("ano", getHomeInfo.getAno());
+        body.put("anoImg", getHomeInfo.getAnoImg());
+
+        BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "홈 화면 정보 조회에 성공하였습니다.", body);
+        return ResponseEntity.ok(response);
+    }
 }
