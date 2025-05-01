@@ -3,6 +3,7 @@ package com.skycastle.mindtune.service;
 import com.skycastle.mindtune.dto.UserLoginRequestDTO;
 import com.skycastle.mindtune.dto.UserMypageResponseDTO;
 import com.skycastle.mindtune.dto.UserSignupRequestDTO;
+import com.skycastle.mindtune.dto.UserHomeRequestDTO;
 import com.skycastle.mindtune.entity.UserAvaEntity;
 import com.skycastle.mindtune.entity.UserAvaLockEntity;
 import com.skycastle.mindtune.entity.UserEntity;
@@ -108,6 +109,24 @@ public class UserService {
                 userAvaEntity.getAno(),
                 imgUrl,
                 userEntity.getAttend()
+        );
+    }
+
+    public UserHomeRequestDTO getHome(Long uno) {
+
+        UserEntity userEntity = userRepository.findById(uno)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        UserAvaEntity userAvaEntity = userAvaRepository.findByUno(uno);
+
+        String imgUrl = avaRepository.findByAno(userAvaEntity.getAno())
+                .map(AvaEntity::getImg)
+                .orElse(null);
+
+        return new UserHomeRequestDTO(
+                userEntity.getUno(),
+                userAvaEntity.getAno(),
+                imgUrl
         );
     }
 }
