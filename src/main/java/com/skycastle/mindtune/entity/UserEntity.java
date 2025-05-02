@@ -2,6 +2,8 @@ package com.skycastle.mindtune.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,4 +40,7 @@ public class UserEntity {
 
     @Column(name = "inactive_date")
     private LocalDateTime inactiveDate;
+
+    @Column(name = "last_attend_date")
+    private LocalDate lastAttendDate;
 }

@@ -1,10 +1,7 @@
 package com.skycastle.mindtune.controller;
 
 import com.skycastle.mindtune.auth.JwtTokenProvider;
-import com.skycastle.mindtune.dto.UserHomeRequestDTO;
-import com.skycastle.mindtune.dto.UserLoginRequestDTO;
-import com.skycastle.mindtune.dto.UserMypageResponseDTO;
-import com.skycastle.mindtune.dto.UserSignupRequestDTO;
+import com.skycastle.mindtune.dto.*;
 import com.skycastle.mindtune.reponse.BaseResponse;
 import com.skycastle.mindtune.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -116,4 +113,81 @@ public class UserController {
         BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "홈 화면 정보 조회에 성공하였습니다.", body);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> getUserInfo(@RequestHeader("Authorization") String token) {
+
+        String jwtToken = token.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserInfoResponseDTO userInfo = userService.getUserInfo(uno);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("uno", userInfo.getUno());
+        body.put("name", userInfo.getName());
+        body.put("email", userInfo.getEmail());
+
+        BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "회원 정보 조회에 성공하였습니다.", body);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/changeinfo")
+    public ResponseEntity<?> changeUserInfo(@RequestHeader("Authorization") String token, @RequestBody UserChangeInfoRequestDTO request) {
+
+        String jwtToken = token.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserChangeInfoResponseDTO updatedUser = userService.updateUserInfo(uno, request);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("uno", uno);
+        body.put("name", updatedUser.getName());
+        body.put("email", updatedUser.getEmail());
+
+        BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "회원 정보 수정에 성공하였습니다.", body);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+
+        String jwtToken = token.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        // 실제 토큰 삭제는 클라이언트에서만 함
+        // 여기선 단순히 성공 메시지만 전달
+        BaseResponse<String> response = new BaseResponse<>(1000, "로그아웃에 성공하였습니다.", null);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/withdraw")
+    public ResponseEntity<?> withdraw(@RequestHeader("Authorization") String token) {
+
+        String jwtToken = token.replace("Bearer ", "");
+
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        userService.withdrawUser(uno);
+
+        BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "회원 탈퇴에 성공하였습니다.", null);
+        return ResponseEntity.ok(response);
+    }
+
 }
