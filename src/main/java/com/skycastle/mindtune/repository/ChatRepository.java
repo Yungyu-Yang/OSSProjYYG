@@ -10,13 +10,10 @@ import java.util.Optional;
 
 public interface ChatRepository extends JpaRepository<ChatEntity, Long> {
 
-    List<ChatEntity> findByUserEntityOrderByCreatedAtAsc(UserEntity userEntity);
-//  채팅 내역 생성일자 오름차순으로 조회
-
-    List<ChatEntity> findByUserEntityAndIsBot(UserEntity userEntity, int isBot);
+//  List<ChatEntity> findByUserEntityAndIsBot(UserEntity userEntity, int isBot);
 //  특정 사용자에 대해 isBot이 주어진 값인 채팅만 조회(사용자가 보낸 채팅만 조회할 때 사용)
 
-    Optional<ChatEntity> findFirstByUserEntityAndIsBotOrderByCreatedAtDesc(UserEntity userEntity, int isBot);
+//  Optional<ChatEntity> findFirstByUserEntityAndIsBotOrderByCreatedAtDesc(UserEntity userEntity, int isBot);
 //  특정 사용자에 대해 최신 GPT 응답 조회(사용자의 채팅에 GPT가 응답할 때 사용)
 
     List<ChatEntity> findByUserEntityAndCreatedAtBetweenOrderByCreatedAtAsc(UserEntity user, LocalDateTime start, LocalDateTime end);
