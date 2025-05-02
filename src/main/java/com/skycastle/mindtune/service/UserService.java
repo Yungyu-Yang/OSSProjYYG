@@ -1,9 +1,6 @@
 package com.skycastle.mindtune.service;
 
-import com.skycastle.mindtune.dto.UserLoginRequestDTO;
-import com.skycastle.mindtune.dto.UserMypageResponseDTO;
-import com.skycastle.mindtune.dto.UserSignupRequestDTO;
-import com.skycastle.mindtune.dto.UserHomeRequestDTO;
+import com.skycastle.mindtune.dto.*;
 import com.skycastle.mindtune.entity.UserAvaEntity;
 import com.skycastle.mindtune.entity.UserAvaLockEntity;
 import com.skycastle.mindtune.entity.UserEntity;
@@ -16,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -39,6 +37,7 @@ public class UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .status(1)
                 .attend(1)
+                .lastAttendDate(LocalDate.now())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -84,8 +83,19 @@ public class UserService {
             throw new IllegalArgumentException("회원이 존재하지 않습니다.");
         }
 
+        if(user.getStatus() == 0){
+            throw new IllegalArgumentException("탈퇴한 회원입니다.");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        LocalDate today = LocalDate.now();
+        if (user.getLastAttendDate() == null || !user.getLastAttendDate().isEqual(today)) {
+            user.setAttend(user.getAttend() + 1);
+            user.setLastAttendDate(today);
+            userRepository.save(user);
         }
 
         return user.getUno();
@@ -129,4 +139,41 @@ public class UserService {
                 imgUrl
         );
     }
+
+    public UserInfoResponseDTO getUserInfo(Long uno) {
+
+        UserEntity userEntity = userRepository.findById(uno)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        return new UserInfoResponseDTO(
+                userEntity.getUno(),
+                userEntity.getName(),
+                userEntity.getEmail()
+        );
+    }
+
+    public UserChangeInfoResponseDTO updateUserInfo(Long uno, UserChangeInfoRequestDTO request) {
+        UserEntity user = userRepository.findById(uno)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
+        userRepository.save(user);
+
+        return new UserChangeInfoResponseDTO(user.getName(), user.getEmail());
+    }
+
+    public void withdrawUser(Long uno) {
+        UserEntity userEntity = userRepository.findById(uno)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        userEntity.setStatus(0);
+        userRepository.save(userEntity);
+    }
+
 }
