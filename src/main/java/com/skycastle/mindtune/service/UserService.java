@@ -98,6 +98,18 @@ public class UserService {
             userRepository.save(user);
         }
 
+        if (user.getAttend() % 10 == 0) {
+            long anoToUnlock = (user.getAttend() / 10) + 2; // ano: 3 ~ 10
+            if (anoToUnlock <= 10) {
+                UserAvaLockEntity lock = userAvaLockRepository.findByUnoAndAno(user.getUno(), anoToUnlock);
+                if (lock != null && lock.getStatus() == 0) {
+                    lock.setStatus(1);
+                    lock.setUpdatedAt(LocalDateTime.now());
+                    userAvaLockRepository.save(lock);
+                }
+            }
+        }
+
         return user.getUno();
     }
 
