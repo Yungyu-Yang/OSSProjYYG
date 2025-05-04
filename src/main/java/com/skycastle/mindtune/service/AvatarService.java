@@ -12,6 +12,7 @@ import com.skycastle.mindtune.repository.UserAvaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,9 +50,16 @@ public class AvatarService {
     }
 
     public AvatarSelectInfoResponseDTO changeAvatar(Long uno, AvatarSelectChangeRequestDTO request) {
+
+        UserAvaLockEntity lock = userAvaLockRepository.findByUnoAndAno(uno, request.getAno());
+        if (lock == null || lock.getStatus() == 0) {
+            throw new IllegalArgumentException("해당 아바타는 잠겨있어 선택할 수 없습니다.");
+        }
+
         UserAvaEntity userAva = userAvaRepository.findByUno(uno);
         if (userAva == null) throw new IllegalArgumentException("아바타 선택 정보가 없습니다.");
         userAva.setAno(request.getAno());
+        userAva.setUpdatedAt(LocalDateTime.now());
         userAvaRepository.save(userAva);
         return AvatarSelectInfoResponseDTO.builder()
                 .uno(userAva.getUno())
