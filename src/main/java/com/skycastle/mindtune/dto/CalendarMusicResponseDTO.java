@@ -1,9 +1,10 @@
 package com.skycastle.mindtune.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
-@Getter
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class CalendarMusicResponseDTO {
     private Long uno;
