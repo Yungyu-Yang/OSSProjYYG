@@ -15,15 +15,14 @@ public class DayMusicEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long dmno;
 
-    @Column(name = "uno")
     private Long uno;
 
-    @Column(name = "prompt")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String prompt;
 
-    @Column(name = "music")
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String music;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 } 
