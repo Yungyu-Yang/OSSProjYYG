@@ -10,6 +10,7 @@ public class MindtuneApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MindtuneApplication.class, args);
+		System.out.println("Current working directory: " + System.getProperty("user.dir"));
 	}
 
 }
