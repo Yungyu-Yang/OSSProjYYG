@@ -12,6 +12,9 @@ import com.skycastle.mindtune.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +22,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-
 public class ChatService {
 
     private final ChatRepository chatRepository;
@@ -39,7 +41,7 @@ public class ChatService {
                 .build();
         chatRepository.save(userChat);
 
-        String gptReply = generateGPTResponse(request.getMessage());//실제 GPT 적용 시 수정
+        String gptReply = generateGPTResponse(request.getMessage());
 
         ChatEntity botChat = ChatEntity.builder()
                 .userEntity(user)
@@ -68,11 +70,11 @@ public class ChatService {
                 .build();
         chatRepository.save(userChat);
 
-        String gptReply = generateGPTResponse(request.getVoiceurl());
+        String gptReply = generateGPTVoiceResponse(request.getVoiceurl());
 
         ChatEntity botChat = ChatEntity.builder()
                 .userEntity(user)
-                .chat(gptReply) // GPT가 생성한 텍스트 응답
+                .chat(gptReply)
                 .isBot(1)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -122,7 +124,31 @@ public class ChatService {
                 .build();
     }
 
-    private String generateGPTResponse(String inputAudioUrl) {
+    private String generateGPTResponse(String userMessage) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("python3", "src/main/java/com/skycastle/mindtune/model/response.py", userMessage);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Python script failed with exit code " + exitCode);
+            }
+
+            return output.toString();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to call Python script", e);
+        }
+    }
+
+    private String generateGPTVoiceResponse(String inputAudioUrl) {
         // 실제로는 mp3를 분석해서 응답 생성
         return "챗봇의 응답 메시지"; // 예시 응답
     }
