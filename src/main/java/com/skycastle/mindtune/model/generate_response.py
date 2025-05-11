@@ -1,7 +1,8 @@
+import os
 import sys
 import openai
 
-openai.api_key = "YOUR_API_KEY";
+openai.api_key = os.environ["OPENAI_API_KEY"]
 
 def generate_reply(user_input):
     response = openai.chat.completions.create(

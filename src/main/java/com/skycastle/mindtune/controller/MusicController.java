@@ -2,6 +2,8 @@ package com.skycastle.mindtune.controller;
 
 import com.skycastle.mindtune.auth.JwtTokenProvider;
 import com.skycastle.mindtune.dto.CalendarMusicResponseDTO;
+import com.skycastle.mindtune.dto.MusicGenerationRequestDTO;
+import com.skycastle.mindtune.dto.PromptStyleResponseDTO;
 import com.skycastle.mindtune.reponse.BaseResponse;
 import com.skycastle.mindtune.service.MusicService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -23,8 +26,22 @@ public class MusicController {
     private final MusicService musicService;
     private final JwtTokenProvider jwtTokenProvider;
 
+    @PostMapping("/analyze")
+    public ResponseEntity<?> analyzeEmotion(@RequestHeader("Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", "");
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<PromptStyleResponseDTO> response = musicService.analyzeEmotion(uno);
+
+        return ResponseEntity.ok(new BaseResponse<>(1000, "감정 분석 완료", response));
+    }
+
     @PostMapping("/generate")
-    public ResponseEntity<?> createDayMusic(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> createDayMusic(@RequestHeader("Authorization") String token,
+                                            @RequestBody MusicGenerationRequestDTO request) {
 
         String jwtToken = token.replace("Bearer ", "");
 
@@ -34,7 +51,7 @@ public class MusicController {
 
         Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        CalendarMusicResponseDTO musicResponse = musicService.getTodayMusicByUno(uno);
+        CalendarMusicResponseDTO musicResponse = musicService.getTodayMusicByUno(uno, request);
 
         Map<String, Object> body = new HashMap<>();
         body.put("uno", musicResponse.getUno());
