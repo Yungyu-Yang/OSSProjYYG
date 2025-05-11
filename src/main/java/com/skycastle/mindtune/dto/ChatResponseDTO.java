@@ -11,4 +11,5 @@ public class ChatResponseDTO {
     private String chat;
     private int isbot;
     private LocalDateTime created_at;
+    private String audioUrl;
 }

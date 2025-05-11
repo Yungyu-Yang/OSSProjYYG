@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/user/signup", "/user/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/user/checkemail", "/user/checkname").permitAll()
                         .requestMatchers("/error").permitAll()
+                        .requestMatchers("/audio/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

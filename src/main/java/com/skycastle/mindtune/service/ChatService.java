@@ -1,5 +1,8 @@
 package com.skycastle.mindtune.service;
 
+import com.google.cloud.texttospeech.v1.*;
+
+import com.google.protobuf.ByteString;
 import com.skycastle.mindtune.dto.*;
 import com.skycastle.mindtune.entity.AvaEntity;
 import com.skycastle.mindtune.entity.ChatEntity;
@@ -9,15 +12,21 @@ import com.skycastle.mindtune.repository.AvaRepository;
 import com.skycastle.mindtune.repository.ChatRepository;
 import com.skycastle.mindtune.repository.UserAvaRepository;
 import com.skycastle.mindtune.repository.UserRepository;
+import com.skycastle.mindtune.voice.VoiceStyle;
+import com.skycastle.mindtune.voice.VoiceStyleConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 //import java.util.Optional;
 
 @Service
@@ -62,15 +71,19 @@ public class ChatService {
     public ChatResponseDTO saveVoiceChat(Long uno, VoiceChatSaveRequestDTO request) {
         UserEntity user = getUserOrThrow(uno);
 
+        String voiceUrl = request.getVoiceurl();
+        // generateSTT함수를 수정(맨 아래에 있음)
+        String convertText = generateSTT(voiceUrl);
+
         ChatEntity userChat = ChatEntity.builder()
                 .userEntity(user)
-                .chat(request.getVoiceurl()) // mp3 URL 자체를 저장
+                .chat(convertText)
                 .isBot(0)
                 .createdAt(LocalDateTime.now())
                 .build();
         chatRepository.save(userChat);
 
-        String gptReply = generateGPTVoiceResponse(request.getVoiceurl());
+        String gptReply = generateGPTVoiceResponse(convertText);
 
         ChatEntity botChat = ChatEntity.builder()
                 .userEntity(user)
@@ -80,10 +93,14 @@ public class ChatService {
                 .build();
         chatRepository.save(botChat);
 
+        // tts
+        String filename = generateTTS(gptReply, uno);
+
         return ChatResponseDTO.builder()
                 .chat(botChat.getChat())
                 .isbot(botChat.getIsBot())
                 .created_at(botChat.getCreatedAt())
+                .audioUrl("http://localhost:8080/audio/" + filename + ".mp3")
                 .build();
     }
 
@@ -148,13 +165,98 @@ public class ChatService {
         }
     }
 
-    private String generateGPTVoiceResponse(String inputAudioUrl) {
-        // 실제로는 mp3를 분석해서 응답 생성
-        return "챗봇의 응답 메시지"; // 예시 응답
+    private String generateGPTVoiceResponse(String convertText) {
+        // 지우지 마세요 **테스트 용도**
+//        try {
+//            ProcessBuilder pb = new ProcessBuilder("python3", "src/main/java/com/skycastle/mindtune/model/generate_response.py", convertText);
+//            pb.redirectErrorStream(true);
+//            Process process = pb.start();
+//
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            StringBuilder output = new StringBuilder();
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                output.append(line);
+//            }
+//
+//            int exitCode = process.waitFor();
+//            if (exitCode != 0) {
+//                throw new RuntimeException("Python script failed with exit code " + exitCode);
+//            }
+//
+//            return output.toString();
+//        } catch (IOException | InterruptedException e) {
+//            throw new RuntimeException("Failed to call Python script", e);
+//        }
+        return "GPT 테스트 응답 입니다. ";
     }
 
     private UserEntity getUserOrThrow(Long uno) {
         return userRepository.findById(uno)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
     }
+
+    private String generateTTS(String text, Long uno) {
+        try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
+
+            // 1. uno로 ano 조회
+            UserAvaEntity userAva = userAvaRepository.findByUno(uno);
+            if (userAva == null) {
+                throw new RuntimeException("아바타 정보가 없습니다.");
+            }
+            Long ano = userAva.getAno();
+            System.out.println("Find ano: " + ano);
+
+            // 2. voiceMap에서 VoiceStyle 가져오기
+            VoiceStyle style = VoiceStyleConfig.voiceMap.getOrDefault(
+                    ano.intValue(),
+                    new VoiceStyle("ko-KR-Standard-A", "<prosody rate='fast' pitch='+2st'>")
+            );
+            System.out.println("Get style: " + style);
+
+            // 3. SSML 태그로 감정 스타일 적용
+            String ssml = "<speak>" + style.getProsodyTag() + text + "</prosody></speak>";
+            System.out.println("Generated SSML: " + ssml);
+
+            // 4. 입력 설정 (SSML 사용!)
+            SynthesisInput input = SynthesisInput.newBuilder()
+                    .setSsml(ssml)
+                    .build();
+
+            VoiceSelectionParams voice = VoiceSelectionParams.newBuilder()
+                    .setLanguageCode("en-US")
+                    .setName(style.getVoiceName())
+                    .build();
+
+            AudioConfig audioConfig = AudioConfig.newBuilder()
+                    .setAudioEncoding(AudioEncoding.MP3)
+                    .build();
+
+            SynthesizeSpeechResponse response = textToSpeechClient.synthesizeSpeech(input, voice, audioConfig);
+            System.out.println("Response received: " + response);
+            ByteString audioContents = response.getAudioContent();
+
+            // 5. mp3 파일 저장
+            String filename = UUID.randomUUID().toString();
+            Path outputPath = Paths.get("src/main/resources/static/audio/" + filename + ".mp3");
+
+            try {
+                Files.write(outputPath, audioContents.toByteArray());
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException("오디오 파일 저장 중 오류 발생: " + e.getMessage(), e);
+            }
+
+            return filename;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("TTS 변환 중 오류 발생");
+        }
+    }
+
+    private String generateSTT(String text) {
+        return "변환된 test stt 응답 입니다.(사용자 voice text 변환)";
+    }
+
 }

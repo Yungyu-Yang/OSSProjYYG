@@ -66,6 +66,7 @@ public class ChatController {
         body.put("chat", chat.getChat());
         body.put("isbot", chat.getIsbot());
         body.put("created_at", chat.getCreated_at());
+        body.put("audio_url", chat.getAudioUrl());
 
         BaseResponse<Map<String, Object>> response = new BaseResponse<>(1000, "음성 채팅이 성공적으로 저장되었습니다.", body);
         return ResponseEntity.ok(response);
