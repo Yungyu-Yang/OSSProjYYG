@@ -4,10 +4,15 @@ import com.skycastle.mindtune.dto.*;
 import com.skycastle.mindtune.entity.*;
 import com.skycastle.mindtune.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
@@ -116,19 +121,91 @@ public class CalendarService {
                 .build();
     }
 
-    // 이달의 음악 생성 (샘플: 실제 생성 로직은 별도 구현 필요)
-    public CalendarMusicResponseDTO generateMonthMusic(Long uno, YearMonth month, String musicPath) {
-        LocalDateTime createdAt = month.atDay(1).atStartOfDay();
-        MonthMusicEntity entity = MonthMusicEntity.builder()
+    // 이달의 음악 생성
+    public CalendarMusicResponseDTO generateMonthMusic(Long uno) {
+
+        LocalDate today = LocalDate.now();
+        LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+        LocalDate lastDayOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+        LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
+        LocalDateTime endOfMonth = lastDayOfMonth.atTime(LocalTime.MAX);
+
+        // 해당 월에 이미 생성된 음악이 있는지 확인
+//        List<MonthMusicEntity> musics = monthMusicRepository.findByUnoAndCreatedAtBetween(uno, startOfMonth, endOfMonth);
+//        if (!musics.isEmpty()) {
+//            MonthMusicEntity music = musics.get(0);
+//            return new CalendarMusicResponseDTO(music.getUno(), music.getMusic());
+//        }
+
+        // 이번 달의 채팅 내역 조회
+        List<ChatEntity> chatList = chatRepository.findByUserEntity_UnoAndCreatedAtBetween(uno, startOfMonth, endOfMonth);
+        if (chatList.isEmpty()) {
+            throw new IllegalArgumentException("이번 달에 대화 기록이 없습니다.");
+        }
+
+        // 사용자 메시지만 추출해서 문자열로 가공
+        String chatContents = chatList.stream()
+                .filter(chat -> chat.getIsBot() == 0)
+                .map(ChatEntity::getChat)
+                .collect(Collectors.joining("\n"));
+
+        // 파이썬 스크립트 실행
+        String[] command = {
+                "python3", "src/main/java/com/skycastle/mindtune/model/generate_month_prompt.py", chatContents
+        };
+
+        String result = runPythonScript(command);
+        String prompt;
+        try {
+            JSONObject json = new JSONObject(result);
+            prompt = json.getString("prompt");
+        } catch (JSONException e) {
+            throw new RuntimeException("JSON 파싱 중 오류 발생: " + e.getMessage(), e);
+        }
+
+        System.out.println("GPT FunctionCalling 결과: " + result);
+        System.out.println("Parsed Prompt: " + prompt);
+
+        // 음악 생성
+        String musicResult = generateMusic(prompt);
+
+        MonthMusicEntity newMusic = MonthMusicEntity.builder()
                 .uno(uno)
-                .prompt(month.toString())
-                .music(musicPath)
-                .createdAt(createdAt)
+                .prompt(prompt)
+                .music(musicResult)
+                .createdAt(LocalDateTime.now())
                 .build();
-        monthMusicRepository.save(entity);
-        return CalendarMusicResponseDTO.builder()
-                .uno(uno)
-                .music(musicPath)
-                .build();
+        monthMusicRepository.save(newMusic);
+
+        return new CalendarMusicResponseDTO(uno, musicResult);
+    }
+
+    public String runPythonScript(String[] command) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(command);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder result = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                result.append(line).append(System.lineSeparator());
+            }
+
+            // 프로세스 종료까지 대기
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Python script failed with exit code " + exitCode);
+            }
+
+            return result.toString().trim();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to call Python script", e);
+        }
+    }
+
+    public String generateMusic(String prompt) {
+        return "생성된 음악.wav";
     }
 } 

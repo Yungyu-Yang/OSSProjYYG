@@ -18,4 +18,7 @@ public interface ChatRepository extends JpaRepository<ChatEntity, Long> {
 
     List<ChatEntity> findByUserEntityAndCreatedAtBetweenOrderByCreatedAtAsc(UserEntity user, LocalDateTime start, LocalDateTime end);
 //  특정 사용자의 채팅,날짜 범위(하루치),오래된 순 정렬
+
+    List<ChatEntity> findByUserEntity_UnoAndCreatedAtBetween(Long uno, LocalDateTime start, LocalDateTime end);
+
 }
