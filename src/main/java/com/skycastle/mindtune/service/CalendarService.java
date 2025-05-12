@@ -151,7 +151,7 @@ public class CalendarService {
 
         // 파이썬 스크립트 실행
         String[] command = {
-                "python3", "src/main/java/com/skycastle/mindtune/model/generate_month_prompt.py", chatContents
+                "python3", "src/main/java/com/skycastle/mindtune/model/function_call.py", "monthly", chatContents
         };
 
         String result = runPythonScript(command);
