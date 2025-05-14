@@ -143,7 +143,7 @@ public class ChatService {
 
     private String generateGPTResponse(String userMessage) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("python3", "src/main/java/com/skycastle/mindtune/model/generate_response.py", userMessage);
+            ProcessBuilder pb = new ProcessBuilder("python", "src/main/java/com/skycastle/mindtune/model/generate_response.py", userMessage);
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
@@ -166,29 +166,27 @@ public class ChatService {
     }
 
     private String generateGPTVoiceResponse(String convertText) {
-        // 지우지 마세요 **테스트 용도**
-//        try {
-//            ProcessBuilder pb = new ProcessBuilder("python3", "src/main/java/com/skycastle/mindtune/model/generate_response.py", convertText);
-//            pb.redirectErrorStream(true);
-//            Process process = pb.start();
-//
-//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//            StringBuilder output = new StringBuilder();
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                output.append(line);
-//            }
-//
-//            int exitCode = process.waitFor();
-//            if (exitCode != 0) {
-//                throw new RuntimeException("Python script failed with exit code " + exitCode);
-//            }
-//
-//            return output.toString();
-//        } catch (IOException | InterruptedException e) {
-//            throw new RuntimeException("Failed to call Python script", e);
-//        }
-        return "GPT 테스트 응답 입니다. ";
+        try {
+            ProcessBuilder pb = new ProcessBuilder("python", "src/main/java/com/skycastle/mindtune/model/generate_response.py", convertText);
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Python script failed with exit code " + exitCode);
+            }
+
+            return output.toString();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to call Python script", e);
+        }
     }
 
     private UserEntity getUserOrThrow(Long uno) {
@@ -255,8 +253,59 @@ public class ChatService {
         }
     }
 
-    private String generateSTT(String text) {
-        return "변환된 test stt 응답 입니다.(사용자 voice text 변환)";
+    private String generateSTT(String voiceUrl) {
+        boolean isWebUrl = voiceUrl.startsWith("http://") || voiceUrl.startsWith("https://");
+        Path tempFilePath = null;
+        try {
+            String filePathToUse;
+            if (isWebUrl) {
+                // 1. 임시 파일 경로 생성
+                String tempFileName = "temp_voice_" + System.currentTimeMillis() + ".mp3";
+                tempFilePath = Paths.get(System.getProperty("java.io.tmpdir"), tempFileName);
+                // 2. 파일 다운로드
+                java.net.URL url = new java.net.URL(voiceUrl);
+                try (java.io.InputStream in = url.openStream()) {
+                    java.nio.file.Files.copy(in, tempFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                }
+                filePathToUse = tempFilePath.toString();
+            } else {
+                // 로컬 파일 경로 사용
+                filePathToUse = voiceUrl;
+            }
+
+            // 3. stt.py 호출
+            ProcessBuilder pb = new ProcessBuilder(
+                    "python",
+                    "src/main/java/com/skycastle/mindtune/model/stt.py",
+                    filePathToUse
+            );
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                System.err.println("Python error output: " + output);
+                throw new RuntimeException("stt.py failed with exit code " + exitCode + ": " + output);
+            }
+
+            return output.toString();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to run STT conversion", e);
+        } finally {
+            // 4. 임시 파일 삭제 (웹에서 다운로드한 경우만)
+            if (isWebUrl && tempFilePath != null) {
+                try {
+                    java.nio.file.Files.deleteIfExists(tempFilePath);
+                } catch (IOException ignore) {}
+            }
+        }
     }
 
 }
