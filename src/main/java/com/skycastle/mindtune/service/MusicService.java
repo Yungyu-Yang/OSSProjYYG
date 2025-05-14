@@ -46,7 +46,7 @@ public class MusicService {
                 .collect(Collectors.joining("\n"));
 
         String[] command = {
-                "python3", "src/main/java/com/skycastle/mindtune/model/function_call.py", "style", chatContents
+                "python", "src/main/java/com/skycastle/mindtune/model/function_call.py", "style", chatContents
         };
 
         String result = runPythonScript(command);
@@ -93,7 +93,7 @@ public class MusicService {
                 .collect(Collectors.joining("\n"));
 
         String[] command = {
-                "python3", "src/main/java/com/skycastle/mindtune/model/function_call.py", "daily", chatContents, request.getStyle(), request.getDescription()
+                "python", "src/main/java/com/skycastle/mindtune/model/function_call.py", "daily", chatContents, request.getStyle(), request.getDescription()
         };
 
         String result = runPythonScript(command);
