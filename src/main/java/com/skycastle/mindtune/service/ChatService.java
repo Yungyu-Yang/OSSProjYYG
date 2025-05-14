@@ -143,7 +143,7 @@ public class ChatService {
 
     private String generateGPTResponse(String userMessage) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("python3", "src/main/java/com/skycastle/mindtune/model/generate_response.py", userMessage);
+            ProcessBuilder pb = new ProcessBuilder("python", "src/main/java/com/skycastle/mindtune/model/generate_response.py", userMessage);
             pb.redirectErrorStream(true);
             Process process = pb.start();
 

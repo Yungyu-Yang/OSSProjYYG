@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -151,7 +152,7 @@ public class CalendarService {
 
         // 파이썬 스크립트 실행
         String[] command = {
-                "python3", "src/main/java/com/skycastle/mindtune/model/function_call.py", "monthly", chatContents
+                "python", "src/main/java/com/skycastle/mindtune/model/function_call.py", "monthly", chatContents
         };
 
         String result = runPythonScript(command);
@@ -206,6 +207,32 @@ public class CalendarService {
     }
 
     public String generateMusic(String prompt) {
-        return "생성된 음악.wav";
+        try {
+            // Python 스크립트 실행: prompt를 인자로 전달
+            ProcessBuilder pb = new ProcessBuilder(
+                    "python",
+                    "src/main/java/com/skycastle/mindtune/model/generate_music.py",
+                    prompt
+            );
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder output = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                output.append(line);
+            }
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                throw new RuntimeException("Python script failed with exit code " + exitCode);
+            }
+
+            // .mp3 URL만 출력된다고 가정하고 그대로 반환
+            return output.toString();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed to call Python script", e);
+        }
     }
 } 
