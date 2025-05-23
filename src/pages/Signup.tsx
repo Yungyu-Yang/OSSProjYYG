@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import logo from '../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +12,40 @@ export default function SignUp() {
   const [isNameAvailable, setIsNameAvailable] = useState<null | boolean>(null);
   const [isEmailAvailable, setIsEmailAvailable] = useState<null | boolean>(null);
   const [loading, setLoading] = useState(false); // 로딩 상태
+
+  {/* 회원가입 */}
+  const handleSignUp = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/user/signup',
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+      console.log('✅ 전체 응답:', response);
+      if (response.data.header?.resultCode === 1000) {
+        alert(response.data.header.resultMsg || '회원가입에 성공했습니다!');
+        navigate('/home');
+      } else {
+        alert(response.data.header.resultMsg || '회원가입에 실패했습니다.');
+      }
+    } catch (error) {
+      alert('회원가입 중 오류가 발생했습니다.');
+      console.error('회원가입 오류: ', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   {/* 이름 중복확인 */}
   const handleNameCheck = async () => {
@@ -118,8 +153,12 @@ export default function SignUp() {
 
         {/* 제출 */}
         <div className="flex justify-center">
-          <button onClick={() => navigate('/home')} className="mb-1 bg-[#ffb3ab] hover:bg-[#FF99A6] text-white px-20 py-2 rounded-lg font-semibold">
-            Sign Up</button>
+          <button
+            onClick={handleSignUp}
+            className="mb-1 bg-[#ffb3ab] hover:bg-[#FF99A6] text-white px-20 py-2 rounded-lg font-semibold"
+            disabled={loading}>
+            {loading ? '회원가입 중...' : 'Sign Up'}
+          </button>
         </div>
 
         {/* 기존 회원 로그인 이동 */}
