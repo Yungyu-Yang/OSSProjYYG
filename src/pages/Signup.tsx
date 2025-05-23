@@ -69,9 +69,14 @@ export default function SignUp() {
       } else {
         setIsNameAvailable(false);
       }
-    } catch (error) {
-      alert('닉네임 중복확인 중 오류가 발생했습니다.');
-      setIsNameAvailable(null);
+    } catch (error: any) {
+      const resultMsg = error.response?.data?.header?.resultMsg;
+      if (resultMsg) {
+        alert(resultMsg);
+      } else {
+        alert('닉네임 중복확인 중 오류가 발생했습니다.');
+      }
+      setIsNameAvailable(false);
       console.error('닉네임 중복확인 오류: ',error);
     } finally {
       setLoading(false);
@@ -101,9 +106,14 @@ export default function SignUp() {
       } else {
         setIsEmailAvailable(false);
       }
-    } catch (error) {
-      alert('이메일 중복확인 중 오류가 발생했습니다.');
-      setIsEmailAvailable(null);
+    } catch (error: any) {
+      const resultMsg = error.response?.data?.header?.resultMsg;
+      if (resultMsg) {
+        alert(resultMsg);
+      } else {
+        alert('이메일 중복확인 중 오류가 발생했습니다.');
+      }
+      setIsEmailAvailable(false);
       console.error('이메일 중복확인 오류: ',error);
     } finally {
       setLoading(false);
