@@ -1,34 +1,86 @@
 import React, { useState, useEffect } from 'react';
 import logo from '../assets/logo.png';
+import axios from 'axios';
 
 export default function EditProfile() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false);
 
-  // 예시로 현재 저장된 유저 정보 불러오기
+  // 회원 정보 불러오기
   useEffect(() => {
-    // 실제로는 API 호출해서 유저 정보 받아올 부분!
     const fetchUserInfo = async () => {
-      // 임시로 하드코딩 (ex. 서버에서 가져왔다고 가정)
-      const userData = {
-        name: '홍길동',
-        email: 'hong@example.com',
-        password: 'password123', // 실제 서비스에서는 비밀번호는 이렇게 불러오지 않음!
-      };
-      setName(userData.name);
-      setEmail(userData.email);
-      setPassword(userData.password);
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('accessToken');
+        const response = await axios.get('http://localhost:8080/user/info', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+        if (response.data.header?.resultCode === 1000) {
+          setName(response.data.body?.name || '');
+          setEmail(response.data.body?.email || '');
+          setPassword(''); // 비밀번호는 빈 값으로
+        } else {
+          setError(response.data.header?.resultMsg || '회원 정보 조회 실패');
+        }
+      } catch (err: any) {
+        setError('회원 정보 조회 중 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
     };
-
     fetchUserInfo();
   }, []);
 
-  const handleUpdate = () => {
-    // 수정 버튼 클릭 시 처리할 로직
-    console.log('수정된 정보:', { name, email, password });
-    // 여기서 API로 수정 요청
+  const handleUpdate = async () => {
+    setUpdating(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.patch(
+        'http://localhost:8080/user/changeinfo',
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.data.header?.resultCode === 1000) {
+        alert(response.data.header.resultMsg || '회원 정보가 성공적으로 수정되었습니다!');
+      } else {
+        alert(response.data.header?.resultMsg || '회원 정보 수정에 실패했습니다.');
+      }
+    } catch (err: any) {
+      const resultMsg = err.response?.data?.header?.resultMsg;
+      if (resultMsg) {
+        alert(resultMsg);
+      } else {
+        alert('회원 정보 수정 중 오류가 발생했습니다.');
+      }
+    } finally {
+      setUpdating(false);
+    }
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen">로딩 중...</div>;
+  }
+  if (error) {
+    return <div className="flex justify-center items-center min-h-screen text-red-500">{error}</div>;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf8] p-4">
@@ -85,8 +137,9 @@ export default function EditProfile() {
           <button
             onClick={handleUpdate}
             className="mb-1 bg-[#ffb3ab] text-white px-20 py-2 rounded-lg font-semibold"
+            disabled={updating}
           >
-            수정하기
+            {updating ? '수정 중...' : '수정하기'}
           </button>
         </div>
       </div>
