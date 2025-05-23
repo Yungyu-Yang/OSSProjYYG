@@ -31,7 +31,6 @@ export default function SignUp() {
           withCredentials: true,
         }
       );
-      console.log('✅ 전체 응답:', response);
       if (response.data.header?.resultCode === 1000) {
         alert(response.data.header.resultMsg || '회원가입에 성공했습니다!');
         navigate('/home');
@@ -49,31 +48,65 @@ export default function SignUp() {
 
   {/* 이름 중복확인 */}
   const handleNameCheck = async () => {
-    setLoading(true); // 로딩 시작
+    if (!name) {
+      alert('닉네임을 입력해주세요.');
+      return;
+    }
+    setLoading(true);
     try {
-      // 여기에 실제 API 호출 넣으면 돼
-      console.log('이름 중복확인 요청:', name);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setIsNameAvailable(true); // 또는 false로
+      const response = await axios.get(
+        `http://localhost:8080/user/checkname`,
+        {
+          params: { name },
+          withCredentials: true,
+        }
+      );
+      const resultCode = response.data.header?.resultCode;
+      const resultMsg = response.data.header?.resultMsg;
+      alert(resultMsg);
+      if (resultCode === 1000) {
+        setIsNameAvailable(true);
+      } else {
+        setIsNameAvailable(false);
+      }
     } catch (error) {
-      console.error(error);
+      alert('닉네임 중복확인 중 오류가 발생했습니다.');
+      setIsNameAvailable(null);
+      console.error('닉네임 중복확인 오류: ',error);
     } finally {
-      setLoading(false); // 로딩 끝
+      setLoading(false);
     }
   };
 
   {/* 이메일 중복확인 */}
   const handleEmailCheck = async () => {
-    setLoading(true); // 로딩 시작
+    if (!email) {
+      alert('이메일을 입력해주세요.');
+      return;
+    }
+    setLoading(true);
     try {
-      // 여기에 실제 API 호출 넣으면 돼
-      console.log('이메일 중복확인 요청:', email);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setIsEmailAvailable(true); // 또는 false로
+      const response = await axios.get(
+        `http://localhost:8080/user/checkemail`,
+        {
+          params: { email },
+          withCredentials: true,
+        }
+      );
+      const resultCode = response.data.header?.resultCode;
+      const resultMsg = response.data.header?.resultMsg;
+      alert(resultMsg);
+      if (resultCode === 1000) {
+        setIsEmailAvailable(true);
+      } else {
+        setIsEmailAvailable(false);
+      }
     } catch (error) {
-      console.error(error);
+      alert('이메일 중복확인 중 오류가 발생했습니다.');
+      setIsEmailAvailable(null);
+      console.error('이메일 중복확인 오류: ',error);
     } finally {
-      setLoading(false); // 로딩 끝
+      setLoading(false);
     }
   };
 
