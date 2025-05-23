@@ -19,6 +19,7 @@ export default function MyPage() {
   const [userInfo, setUserInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
 
   useEffect(() => {
     const fetchMypage = async () => {
@@ -47,8 +48,38 @@ export default function MyPage() {
     fetchMypage();
   }, []);
 
-  const handleWithdraw = () => {
-    navigate('/'); // '/'로 이동
+  const handleWithdraw = async () => {
+    setWithdrawLoading(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const response = await axios.patch(
+        'http://localhost:8080/user/withdraw',
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.data.header?.resultCode === 1000) {
+        alert(response.data.header.resultMsg || '회원 탈퇴에 성공하였습니다.');
+        navigate('/');
+      } else {
+        alert(response.data.header?.resultMsg || '회원 탈퇴에 실패하였습니다.');
+      }
+    } catch (err: any) {
+      const resultMsg = err.response?.data?.header?.resultMsg;
+      if (resultMsg) {
+        alert(resultMsg);
+      } else {
+        alert('회원 탈퇴 중 오류가 발생했습니다.');
+        console.log('회원 탈퇴 오류: ', err);
+      }
+    } finally {
+      setWithdrawLoading(false);
+    }
   };
 
   if (loading) {
@@ -111,8 +142,9 @@ export default function MyPage() {
                 <button 
                   className="bg-[#FFB3AB] text-white px-6 py-2 rounded"
                   onClick={handleWithdraw}
+                  disabled={withdrawLoading}
                 >
-                  탈퇴하기
+                  {withdrawLoading ? '탈퇴 중...' : '탈퇴하기'}
                 </button>
                 <button 
                   className="bg-[#FFFDF8] text-[#7C6F62] px-6 py-2 rounded"

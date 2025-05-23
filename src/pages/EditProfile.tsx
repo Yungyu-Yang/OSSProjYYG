@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '../assets/logo.png';
 import axios from 'axios';
 
@@ -32,6 +32,7 @@ export default function EditProfile() {
         }
       } catch (err: any) {
         setError('회원 정보 조회 중 오류가 발생했습니다.');
+        console.log('회원 정보 조회 오류: ',err);
       } finally {
         setLoading(false);
       }
@@ -69,6 +70,7 @@ export default function EditProfile() {
         alert(resultMsg);
       } else {
         alert('회원 정보 수정 중 오류가 발생했습니다.');
+        console.log('회원 정보 수정 오류: ', err);
       }
     } finally {
       setUpdating(false);
