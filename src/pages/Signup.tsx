@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import axios from 'axios';
 import logo from '../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
 
@@ -12,33 +13,110 @@ export default function SignUp() {
   const [isEmailAvailable, setIsEmailAvailable] = useState<null | boolean>(null);
   const [loading, setLoading] = useState(false); // 로딩 상태
 
+  {/* 회원가입 */}
+  const handleSignUp = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/user/signup',
+        {
+          name,
+          email,
+          password,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+      if (response.data.header?.resultCode === 1000) {
+        alert(response.data.header.resultMsg || '회원가입에 성공했습니다!');
+        navigate('/home');
+      } else {
+        alert(response.data.header.resultMsg || '회원가입에 실패했습니다.');
+      }
+    } catch (error) {
+      alert('회원가입 중 오류가 발생했습니다.');
+      console.error('회원가입 오류: ', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   {/* 이름 중복확인 */}
   const handleNameCheck = async () => {
-    setLoading(true); // 로딩 시작
+    if (!name) {
+      alert('닉네임을 입력해주세요.');
+      return;
+    }
+    setLoading(true);
     try {
-      // 여기에 실제 API 호출 넣으면 돼
-      console.log('이름 중복확인 요청:', name);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setIsNameAvailable(true); // 또는 false로
-    } catch (error) {
-      console.error(error);
+      const response = await axios.get(
+        `http://localhost:8080/user/checkname`,
+        {
+          params: { name },
+          withCredentials: true,
+        }
+      );
+      const resultCode = response.data.header?.resultCode;
+      const resultMsg = response.data.header?.resultMsg;
+      alert(resultMsg);
+      if (resultCode === 1000) {
+        setIsNameAvailable(true);
+      } else {
+        setIsNameAvailable(false);
+      }
+    } catch (error: any) {
+      const resultMsg = error.response?.data?.header?.resultMsg;
+      if (resultMsg) {
+        alert(resultMsg);
+      } else {
+        alert('닉네임 중복확인 중 오류가 발생했습니다.');
+      }
+      setIsNameAvailable(false);
+      console.error('닉네임 중복확인 오류: ',error);
     } finally {
-      setLoading(false); // 로딩 끝
+      setLoading(false);
     }
   };
 
   {/* 이메일 중복확인 */}
   const handleEmailCheck = async () => {
-    setLoading(true); // 로딩 시작
+    if (!email) {
+      alert('이메일을 입력해주세요.');
+      return;
+    }
+    setLoading(true);
     try {
-      // 여기에 실제 API 호출 넣으면 돼
-      console.log('이메일 중복확인 요청:', email);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setIsEmailAvailable(true); // 또는 false로
-    } catch (error) {
-      console.error(error);
+      const response = await axios.get(
+        `http://localhost:8080/user/checkemail`,
+        {
+          params: { email },
+          withCredentials: true,
+        }
+      );
+      const resultCode = response.data.header?.resultCode;
+      const resultMsg = response.data.header?.resultMsg;
+      alert(resultMsg);
+      if (resultCode === 1000) {
+        setIsEmailAvailable(true);
+      } else {
+        setIsEmailAvailable(false);
+      }
+    } catch (error: any) {
+      const resultMsg = error.response?.data?.header?.resultMsg;
+      if (resultMsg) {
+        alert(resultMsg);
+      } else {
+        alert('이메일 중복확인 중 오류가 발생했습니다.');
+      }
+      setIsEmailAvailable(false);
+      console.error('이메일 중복확인 오류: ',error);
     } finally {
-      setLoading(false); // 로딩 끝
+      setLoading(false);
     }
   };
 
@@ -118,8 +196,12 @@ export default function SignUp() {
 
         {/* 제출 */}
         <div className="flex justify-center">
-          <button onClick={() => navigate('/home')} className="mb-1 bg-[#ffb3ab] hover:bg-[#FF99A6] text-white px-20 py-2 rounded-lg font-semibold">
-            Sign Up</button>
+          <button
+            onClick={handleSignUp}
+            className="mb-1 bg-[#ffb3ab] hover:bg-[#FF99A6] text-white px-20 py-2 rounded-lg font-semibold"
+            disabled={loading}>
+            {loading ? '회원가입 중...' : 'Sign Up'}
+          </button>
         </div>
 
         {/* 기존 회원 로그인 이동 */}
