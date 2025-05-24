@@ -10,38 +10,45 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    try {
-      const response = await axios.post(
-        'http://localhost:8080/user/login',
-        {
-          email,
-          password,
+  console.log('📥 로그인 시도:', { email, password }); // 입력값 확인
+
+  try {
+    const response = await axios.post(
+      'http://localhost:8080/user/login',
+      {
+        email,
+        password,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        }
-      );
-      console.log('✅ 전체 응답:', response);
-      // 헤더에서 accessToken 추출
-      const token = response.headers['authorization'];
-      const uno = response.data.body?.uno;
-
-      if (token) {
-        localStorage.setItem('accessToken', token);
-        localStorage.setItem('uno', uno);
-        navigate('/home');
-      } else {
-        alert('로그인 실패: 토큰이 없습니다.');
+        withCredentials: true,
       }
-    } catch (error) {
-      console.error('로그인 오류:', error);
-      alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.');
-    }
-  };
+    );
 
+    console.log('✅ 전체 응답:', response);
+    console.log('🔑 응답 헤더:', response.headers);
+    console.log('📦 응답 바디:', response.data);
+
+    const token = response.headers['authorization'];
+    const uno = response.data.body?.uno;
+
+    if (token) {
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('uno', uno);
+      console.log('🧠 저장된 토큰:', token);
+      console.log('🧠 저장된 uno:', uno);
+      navigate('/home');
+    } else {
+      alert('로그인 실패: 토큰이 없습니다.');
+    }
+
+  } catch (error) {
+    console.error('❌ 로그인 오류:', error);
+    alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.');
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf8] p-4">
