@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 //import java.util.Optional;
@@ -63,7 +64,7 @@ public class ChatService {
         return ChatResponseDTO.builder()
                 .chat(botChat.getChat())
                 .isbot(botChat.getIsBot())
-                .created_at(botChat.getCreatedAt())
+                .createdAt(botChat.getCreatedAt())
                 .build();
     }
 
@@ -72,7 +73,6 @@ public class ChatService {
         UserEntity user = getUserOrThrow(uno);
 
         String voiceUrl = request.getVoiceurl();
-        // generateSTT함수를 수정(맨 아래에 있음)
         String convertText = generateSTT(voiceUrl);
 
         ChatEntity userChat = ChatEntity.builder()
@@ -97,10 +97,13 @@ public class ChatService {
         String filename = generateTTS(gptReply, uno);
 
         return ChatResponseDTO.builder()
+                .userChat(userChat.getChat())
+                .userIsbot(userChat.getIsBot())
+                .userCreatedAt(userChat.getCreatedAt())
                 .chat(botChat.getChat())
                 .isbot(botChat.getIsBot())
-                .created_at(botChat.getCreatedAt())
-                .audioUrl("http://localhost:8080/audio/" + filename + ".mp3")
+                .createdAt(botChat.getCreatedAt())
+                .audioUrl(filename)
                 .build();
     }
 
@@ -234,18 +237,21 @@ public class ChatService {
             System.out.println("Response received: " + response);
             ByteString audioContents = response.getAudioContent();
 
-            // 5. mp3 파일 저장
-            String filename = UUID.randomUUID().toString();
-            Path outputPath = Paths.get("src/main/resources/static/audio/" + filename + ".mp3");
+//            // 5. mp3 파일 저장
+//            String filename = UUID.randomUUID().toString();
+//            Path outputPath = Paths.get("src/main/resources/static/audio/" + filename + ".mp3");
+//
+//            try {
+//                Files.write(outputPath, audioContents.toByteArray());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                throw new RuntimeException("오디오 파일 저장 중 오류 발생: " + e.getMessage(), e);
+//            }
+//
+//            return filename;
+            String base64Audio = Base64.getEncoder().encodeToString(audioContents.toByteArray());
 
-            try {
-                Files.write(outputPath, audioContents.toByteArray());
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException("오디오 파일 저장 중 오류 발생: " + e.getMessage(), e);
-            }
-
-            return filename;
+            return base64Audio;
 
         } catch (Exception e) {
             e.printStackTrace();
