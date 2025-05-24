@@ -8,4 +8,8 @@ import lombok.Getter;
 
 public class VoiceChatSaveRequestDTO {
     private String voiceurl;
+
+    public VoiceChatSaveRequestDTO(String voiceurl) {
+        this.voiceurl = voiceurl;
+    }
 }

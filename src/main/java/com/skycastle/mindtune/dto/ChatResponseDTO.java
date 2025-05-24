@@ -8,8 +8,12 @@ import java.time.LocalDateTime;
 @Builder
 
 public class ChatResponseDTO {
+    private String userChat;
+    private Integer userIsbot;
+    private LocalDateTime userCreatedAt;
+
     private String chat;
     private int isbot;
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
     private String audioUrl;
 }

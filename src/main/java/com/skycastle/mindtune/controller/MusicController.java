@@ -83,5 +83,20 @@ public class MusicController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/save")
+    public ResponseEntity<?> saveMusic(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestHeader("Authorization") String token) {
+        String jwtToken = token.replace("Bearer ", "");
+        if (!jwtTokenProvider.validateToken(jwtToken)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
+        }
+
+        Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        musicService.saveLatestMusic(uno, date);
+        return ResponseEntity.ok().body("가장 최근 음악만 저장되고, 나머지는 삭제되었습니다.");
+    }
+
 
 }
