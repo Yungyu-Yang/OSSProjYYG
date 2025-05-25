@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class MusicController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveMusic(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("date") String dateStr,
             @RequestHeader("Authorization") String token) {
         String jwtToken = token.replace("Bearer ", "");
         if (!jwtTokenProvider.validateToken(jwtToken)) {
@@ -93,6 +94,13 @@ public class MusicController {
         }
 
         Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        LocalDate date;
+        try {
+            date = LocalDate.parse(dateStr);  // 기본 ISO 포맷 (yyyy-MM-dd) 파싱
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body("Invalid date format: " + dateStr);
+        }
 
         musicService.saveLatestMusic(uno, date);
         return ResponseEntity.ok().body("가장 최근 음악만 저장되고, 나머지는 삭제되었습니다.");

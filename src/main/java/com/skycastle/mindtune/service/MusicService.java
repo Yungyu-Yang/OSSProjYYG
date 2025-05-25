@@ -207,11 +207,14 @@ public class MusicService {
     }
 
     public void saveLatestMusic(Long uno, LocalDate date) {
-        List<DayMusicEntity> musicList = dayMusicRepository.findByUnoAndCreatedAtOrderByCreatedAtDesc(uno, date);
+        LocalDateTime startOfDay = date.atStartOfDay(); // 00:00:00
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX); // 23:59:59.999999999
+
+        List<DayMusicEntity> musicList = dayMusicRepository
+                .findByUnoAndCreatedAtBetweenOrderByCreatedAtDesc(uno, startOfDay, endOfDay);
 
         if (musicList.size() <= 1) return;
 
-        // 최근 1개만 제외하고 삭제
         List<DayMusicEntity> toDelete = musicList.subList(1, musicList.size());
         dayMusicRepository.deleteAll(toDelete);
     }
