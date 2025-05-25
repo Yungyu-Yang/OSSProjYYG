@@ -10,6 +10,7 @@ public class CalendarDayDetailResponseDTO {
     private Long uno;
     private Long ano;
     private String anoImg;
+    private String anoName;
     private Long eino;
     private String einoImg;
     private List<ChatLogDTO> chats;

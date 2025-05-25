@@ -39,16 +39,16 @@ public class CalendarService {
         LocalDateTime end = start.plusDays(1);
         Optional<CalenderEntity> calOpt = calenderRepository.findByUnoAndCreatedAtBetween(uno, start, end)
                 .stream().findFirst();
-        if (calOpt.isEmpty()) return null;
-        CalenderEntity cal = calOpt.get();
+        CalenderEntity cal = calOpt.orElse(null);
 
         // 아바타 정보
         UserAvaEntity userAva = userAvaRepository.findByUno(uno);
         Long ano = userAva != null ? userAva.getAno() : null;
         String anoImg = (ano != null) ? avaRepository.findByAno(ano).map(AvaEntity::getImg).orElse("") : "";
+        String anoName = (ano != null) ? avaRepository.findByAno(ano).map(AvaEntity::getName).orElse("") : "";
 
         // 감정 아이콘 정보
-        Long eino = cal.getEino();
+        Long eino = (cal != null) ? cal.getEino() : null;
         EmotionIconEntity einoEntity = eino != null ? emotionIconRepository.findById(eino).orElse(null) : null;
         String einoImg = (einoEntity != null) ? einoEntity.getImg() : "";
 
@@ -70,6 +70,7 @@ public class CalendarService {
                 .uno(uno)
                 .ano(ano)
                 .anoImg(anoImg)
+                .anoName(anoName)
                 .eino(eino)
                 .einoImg(einoImg)
                 .chats(chats)
