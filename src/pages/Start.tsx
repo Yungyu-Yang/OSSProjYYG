@@ -13,7 +13,7 @@ const Start = () => {
 
     const loadAvatars = async () => {
       const avatars = await Promise.all(
-        Array.from({ length: 10 }, (_, i) => import(`../assets/avatar/avatar${i + 1}.png`))
+        Array.from({ length: 10 }, (_, i) => import(`/assets/avatar/avatar${i + 1}.png`))
       );
       setAvatarList(avatars.map((avatar) => avatar.default)); 
     };
