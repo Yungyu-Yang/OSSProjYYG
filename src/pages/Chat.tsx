@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { PiMicrophoneBold, PiArrowRight, PiPlay, PiPause, PiSkipBack, PiSkipForward } from "react-icons/pi";
-import avatar from '../assets/avatar/avatar1.png';
 import axios from "axios";
 
 // 프로그레스 바 애니메이션 스타일
@@ -40,8 +39,11 @@ const Chat = () => {
   const [lastStyle, setLastStyle] = useState<string | null>(null);
   const [lastDescription, setLastDescription] = useState<string | null>(null);
   const [musicUrl, setMusicUrl] = useState<string | null>(null);
-const [showSaveAndRetry, setShowSaveAndRetry] = useState(false);
-const [botAudioUrl, setBotAudioUrl] = useState<string | null>(null);
+  const [showSaveAndRetry, setShowSaveAndRetry] = useState(false);
+  const [botAudioUrl, setBotAudioUrl] = useState<string | null>(null);
+  const [anoImg, setAnoImg] = useState("");
+  const [anoName, setAnoName] = useState("");
+  const [isMusicSaved, setIsMusicSaved] = useState(false);
 
 
 
@@ -112,6 +114,7 @@ const handleGenerateMusicByStyleAgain = () => {
         setIsPlaying(true);
         setAnalyzeResult(null);
         setShowSaveAndRetry(true);
+        setIsMusicSaved(false)
       } else {
         console.warn("음악 생성 실패 또는 잘못된 응답:", res.data);
         setShowSaveAndRetry(false);
@@ -247,6 +250,10 @@ const handleGenerateMusicByStyleAgain = () => {
         });
 
         console.log("📩 채팅 응답 전체:", res.data);
+        const body = res.data.body;
+        setAnoImg(body.anoImg);
+        setAnoName(body.anoName);
+
 
         if (res.data.body?.chats) {
           setChatList(res.data.body.chats);
@@ -398,6 +405,7 @@ const handleGenerateMusicByStyleAgain = () => {
       );
 
       console.log("저장 응답 : ", response.data);
+      setIsMusicSaved(true)
       if(response.data.body){
         console.log('음악이 저장되었습니다!');
       }
@@ -419,10 +427,10 @@ const handleGenerateMusicByStyleAgain = () => {
                 chat.isbot === 1 ? (
                   <div key={index} className="flex items-start space-x-3">
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                      <img src={avatar} alt="Avatar" className="object-cover" />
+                      <img src={anoImg} alt="Avatar" className="object-cover w-10 h-10 rounded-full" />
                     </div>
                     <div className="flex flex-col">
-                      <div>맴미</div>
+                      <div className="text-sm text-gray-600 font-semibold">{anoName}</div>
                       <div className="bg-white p-4 rounded-xl shadow-sm max-w-lg">
                         <p>{chat.chat}</p>
                       </div>
@@ -529,7 +537,7 @@ const handleGenerateMusicByStyleAgain = () => {
                 </div>
               </div>
 
-              {showSaveAndRetry && (
+              {showSaveAndRetry && !isMusicSaved && (
                 <div className="flex justify-center gap-4 mt-2">
                   <button
                     onClick={handleGenerateMusicByStyleAgain}
