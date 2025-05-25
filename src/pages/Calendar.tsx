@@ -3,8 +3,9 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import avatar from '../assets/avatar/avatar1.png';
-import { PiXCircle, PiPlay, PiPause, PiSkipBack, PiSkipForward } from 'react-icons/pi';
+import { PiXCircle } from 'react-icons/pi';
 import axios from 'axios';
+import MusicPlayer from '../components/MusicPlayer';
 
 // FullCalendar 스타일 커스터마이징
 const calendarStyles = `
@@ -209,7 +210,7 @@ const Calendar = () => {
   };
 
   // 이미지 스타일을 설정하는 함수
-  const createImageElement = (src, position = 'absolute', width = '30px', height = '30px', top = '0', left = '10px') => {
+  const createImageElement = (src: string, position = 'absolute', width = '30px', height = '30px', top = '0', left = '10px') => {
     const img = document.createElement('img');
     img.src = src;
     img.style.width = width;
@@ -281,7 +282,14 @@ const Calendar = () => {
 
   // 월간 음악 생성 요청
   const handleGenerateMonthlyMusic = async () => {
-    if (!isLastDayPassed) {
+    // 현재 월의 마지막 날짜를 즉시 계산
+    const [year, mm] = currentMonth.split('-').map(Number);
+    const lastDay = new Date(year, mm, 0);
+    const today = new Date();
+    const isCurrentMonth = today.getFullYear() === year && (today.getMonth() + 1) === mm;
+    const lastDayPassed = isCurrentMonth ? today > lastDay : true;
+
+    if (!lastDayPassed) {
       alert('아직 기록할 날들이 남아있어. 조금만 더 함께해줘!');
       return;
     }
@@ -451,42 +459,7 @@ const Calendar = () => {
               {/* 음악 파일 - Chat.tsx 스타일 플레이어 */}
               {dayDetail && dayDetail.music && (
                 <div className="flex justify-center mt-12 mb-10">
-                  <div className="flex items-center space-x-4 w-full max-w-[400px] bg-[#FFF1E6] rounded-xl p-6 shadow-md">
-                    <audio ref={popupAudioRef} src={dayDetail.music} />
-                    <button
-                      onClick={handlePopupSkipBackward}
-                      className="text-white bg-[#E29578] p-2 rounded-full"
-                      title="10초 뒤로"
-                    >
-                      <PiSkipBack size={20} />
-                    </button>
-                    <button
-                      onClick={handlePopupPlayPause}
-                      className="text-white bg-[#E29578] p-4 rounded-full"
-                      title={popupIsPlaying ? "일시정지" : "재생"}
-                    >
-                      {popupIsPlaying ? <PiPause size={24} /> : <PiPlay size={24} />}
-                    </button>
-                    <button
-                      onClick={handlePopupSkipForward}
-                      className="text-white bg-[#E29578] p-2 rounded-full"
-                      title="10초 앞으로"
-                    >
-                      <PiSkipForward size={20} />
-                    </button>
-                    <div className="flex-1">
-                      <div className="w-full bg-[#FFD6C4] h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-[#FF867C] h-full"
-                          style={{ width: `${(popupCurrentTime / popupDuration) * 100}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between text-sm mt-1 text-[#7C6F62]">
-                        <span>{formatPopupTime(popupCurrentTime)}</span>
-                        <span>{formatPopupTime(popupDuration)}</span>
-                      </div>
-                    </div>
-                  </div>
+                  <MusicPlayer src={dayDetail.music} />
                 </div>
               )}
             </div>
@@ -497,43 +470,8 @@ const Calendar = () => {
       {/* 월간 음악 플레이어/생성 UI */}
       {monthlyMusicUrl ? (
         <div className="flex justify-center items-center mt-8 mb-8">
-          <div className="flex items-center space-x-4 w-full max-w-[600px] bg-[#FFF1E6] rounded-xl p-6 shadow-md">
-            <audio ref={audioRef} src={monthlyMusicUrl} />
-            <button
-              onClick={handleSkipBackward}
-              className="text-white bg-[#E29578] p-2 rounded-full"
-              title="10초 뒤로"
-            >
-              <PiSkipBack size={20} />
-            </button>
-            <button
-              onClick={handlePlayPause}
-              className="text-white bg-[#E29578] p-4 rounded-full"
-              title={isPlaying ? "일시정지" : "재생"}
-            >
-              {isPlaying ? <PiPause size={24} /> : <PiPlay size={24} />}
-            </button>
-            <button
-              onClick={handleSkipForward}
-              className="text-white bg-[#E29578] p-2 rounded-full"
-              title="10초 앞으로"
-            >
-              <PiSkipForward size={20} />
-            </button>
-            <div className="flex-1">
-              <div className="w-full bg-[#FFD6C4] h-2 rounded-full overflow-hidden">
-                <div
-                  className="bg-[#FF867C] h-full"
-                  style={{ width: `${(currentTime / duration) * 100}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between text-sm mt-1 text-[#7C6F62]">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
-            </div>
-          </div>
-            </div>
+          <MusicPlayer src={monthlyMusicUrl} />
+        </div>
       ) : (
       <div className="flex items-center">
         <img src={userAvatar} alt="Avatar" className="w-16 h-16 rounded-full bg-[#DDDBD5] bg-opacity-80 object-cover ml-5" />
