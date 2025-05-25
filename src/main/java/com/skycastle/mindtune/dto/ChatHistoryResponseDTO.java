@@ -8,6 +8,7 @@ import java.util.List;
 public class ChatHistoryResponseDTO {
     private Long uno;
     private Long ano;
+    private String avaName;
     private String anoImg;
     private List<ChatLogDTO> chats;
 }

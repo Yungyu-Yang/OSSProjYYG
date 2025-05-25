@@ -31,6 +31,7 @@ public class CalendarController {
         }
         Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CalendarDayDetailResponseDTO result = calendarService.getDayDetail(uno, date);
+
         BaseResponse<CalendarDayDetailResponseDTO> response = new BaseResponse<>(1000, "하루 기록 조회에 성공하였습니다.", result);
         return ResponseEntity.ok(response);
     }

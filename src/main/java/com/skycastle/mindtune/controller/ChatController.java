@@ -141,6 +141,7 @@ public class ChatController {
         Map<String, Object> body = new HashMap<>();
         body.put("uno", history.getUno());
         body.put("ano", history.getAno());
+        body.put("anoName", history.getAvaName());
         body.put("anoImg", history.getAnoImg());
         body.put("chats", history.getChats());
 

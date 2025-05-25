@@ -121,6 +121,10 @@ public class ChatService {
                 .map(AvaEntity::getImg)
                 .orElseThrow(() -> new IllegalArgumentException("아바타 이미지가 존재하지 않습니다."));
 
+        String name = avaRepository.findByAno(ano)
+                .map(AvaEntity::getName)
+                .orElseThrow(() -> new IllegalArgumentException("아바타 이름이 존재하지 않습니다."));
+
 
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = start.plusDays(1);
@@ -139,6 +143,7 @@ public class ChatService {
         return ChatHistoryResponseDTO.builder()
                 .uno(user.getUno())
                 .ano(ano)
+                .avaName(name)
                 .anoImg(imgUrl)
                 .chats(chats)
                 .build();
