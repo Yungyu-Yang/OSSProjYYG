@@ -3,12 +3,8 @@ package com.skycastle.mindtune.service;
 import com.skycastle.mindtune.dto.CalendarMusicResponseDTO;
 import com.skycastle.mindtune.dto.MusicGenerationRequestDTO;
 import com.skycastle.mindtune.dto.PromptStyleResponseDTO;
-import com.skycastle.mindtune.entity.ChatEntity;
-import com.skycastle.mindtune.entity.DayMusicEntity;
-import com.skycastle.mindtune.entity.EmotionEntity;
-import com.skycastle.mindtune.repository.ChatRepository;
-import com.skycastle.mindtune.repository.DayMusicRepository;
-import com.skycastle.mindtune.repository.EmotionRepository;
+import com.skycastle.mindtune.entity.*;
+import com.skycastle.mindtune.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +26,10 @@ public class MusicService {
     private final DayMusicRepository dayMusicRepository;
     private final ChatRepository chatRepository;
     private final EmotionRepository emotionRepository;
+    private final UserAvaRepository userAvaRepository;
+    private final EmotionIconRepository emotionIconRepository;
+    private final NoteIconRepository noteIconRepository;
+    private final CalenderRepository calenderRepository;
 
     public List<PromptStyleResponseDTO> analyzeEmotion(Long uno) {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
@@ -118,6 +118,27 @@ public class MusicService {
             chat.setEmotionEntity(emotionEntity);
         }
         chatRepository.saveAll(chatList);
+
+        Long ano = userAvaRepository.findByUno(uno).getAno();
+        Long eno = emotionEntity.getEno();
+
+        // emotion_icon_table에서 eieno 조회
+        EmotionIconEntity emotionIconEntity = emotionIconRepository.findByAnoAndEno(ano, eno)
+                .orElseThrow(() -> new IllegalArgumentException("해당 아바타와 감정에 맞는 아이콘이 없습니다."));
+
+        // note_icon_table에서 nino 조회
+        NoteIconEntity noteIconEntity = noteIconRepository.findByName(emotion.toLowerCase())
+                .orElseThrow(() -> new IllegalArgumentException("노트 아이콘 정보를 찾을 수 없습니다."));
+
+        // calendar_table에 저장
+        CalenderEntity calendar = CalenderEntity.builder()
+                .uno(uno)
+                .eino(emotionIconEntity.getEino())
+                .nino(noteIconEntity.getNino())
+                .createdAt(LocalDateTime.now())
+                .build();
+        calenderRepository.save(calendar);
+
 
         // 음악 생성 로직
         String musicResult = generateMusic(prompt);
