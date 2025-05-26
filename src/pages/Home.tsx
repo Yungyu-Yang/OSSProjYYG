@@ -1,24 +1,56 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImage from '../assets/background.png';
-import avatar from '../assets/avatar/avatar1.png';
+import axios from 'axios';
 
 const Home = () => {
   const navigate = useNavigate();
-  
+
+  const [myAvatarUrl, setMyAvatarUrl] = useState<string>('');
   const [avatarList, setAvatarList] = useState<string[]>([]);
 
   useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const uno = localStorage.getItem('uno');
 
-    const loadAvatars = async () => {
-      const avatars = await Promise.all(
-        Array.from({ length: 10 }, (_, i) => import(`../assets/avatar/avatar${i + 1}.png`))
-      );
-      setAvatarList(avatars.map((avatar) => avatar.default)); 
+    if (!token || !uno) {
+      alert('로그인이 필요합니다.');
+      navigate('/signin');
+      return;
+    }
+
+    console.log('📥 홈 정보 조회 시도:', { uno });
+
+    const fetchHomeInfo = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/user/home', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            uno: uno,
+          },
+        });
+
+        console.log('✅ 홈 응답:', response);
+        const avatarPath = response.data.body?.anoImg;
+        setMyAvatarUrl(avatarPath);
+
+      } catch (error) {
+        console.error('❌ 홈 정보 조회 실패:', error);
+        alert('홈 정보를 불러오지 못했습니다.');
+      }
     };
 
-    loadAvatars();
+    const loadAllAvatars = () => {
+      const all = Array.from({ length: 10 }, (_, i) => `/assets/avatar/avatar${i + 1}.png`);
+      setAvatarList(all);
+    };
+
+    loadAllAvatars();
+    fetchHomeInfo();
   }, []);
+
 
   return (
     <div className="fixed inset-0 bg-cover bg-center bg-no-repeat flex items-center justify-center z-0" style={{ backgroundImage: `url(${backgroundImage})` }}>
@@ -61,7 +93,11 @@ const Home = () => {
           오늘 너는 어떤 감정이었을까?
 
           <div className="absolute -right-44 top-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-            <img src={avatar} alt="Avatar" className="w-20 h-20 object-cover" />
+          {myAvatarUrl ? (
+              <img src={myAvatarUrl} alt="My Avatar" className="w-20 h-20 object-cover" />
+            ) : (
+              <span>로딩중...</span>
+            )}
           </div>
         </div>
 
