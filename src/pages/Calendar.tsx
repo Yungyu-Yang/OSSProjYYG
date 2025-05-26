@@ -34,19 +34,10 @@ const Calendar = () => {
   const [monthlyMusicUrl, setMonthlyMusicUrl] = useState<string | null>(null);
   const [isLastDayPassed, setIsLastDayPassed] = useState(false);
   const [isLoadingMusic, setIsLoadingMusic] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = React.useRef<HTMLAudioElement | null>(null);
   // 하루 기록 상세 정보 상태
   const [dayDetail, setDayDetail] = useState<any | null>(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
-  // 팝업 음악 플레이어 상태
-  const [popupIsPlaying, setPopupIsPlaying] = useState(false);
-  const [popupCurrentTime, setPopupCurrentTime] = useState(0);
-  const [popupDuration, setPopupDuration] = useState(0);
-  const popupAudioRef = React.useRef<HTMLAudioElement | null>(null);
   // 회원 아바타 이미지 상태
   const [userAvatar, setUserAvatar] = useState<string>(avatar);
 
@@ -67,12 +58,12 @@ const Calendar = () => {
         const dates = body.dates || [];
         const newEvents = dates.map((dateObj: any) => ({
           date: dateObj.created_at,
-      extendedProps: {
+          extendedProps: {
             imageSrc1: avatarImg, // 아바타 이미지
             emojiImg: dateObj.einoimg, // 감정 아이콘 이미지
             voteImg: dateObj.ninoimg, // 음표 아이콘 이미지
-      },
-      backgroundColor: 'transparent',
+          },
+          backgroundColor: 'transparent',
           borderColor: 'transparent',
         }));
         setEvents(newEvents);
@@ -112,15 +103,17 @@ const Calendar = () => {
   // 월 마지막 날짜 지났는지 계산
   const checkLastDayPassed = (month: string) => {
     const [year, mm] = month.split('-').map(Number);
-    const lastDay = new Date(year, mm, 0); // JS에서 월은 0-indexed
-    const today = new Date(); // 항상 최신 날짜 사용
-    // 오늘이 해당 월에 속하는지 체크 (예: 5월을 보고 있는데 오늘이 5월인지)
+    const lastDay = new Date(year, mm, 0);
+    const today = new Date();
     const isCurrentMonth = today.getFullYear() === year && (today.getMonth() + 1) === mm;
-    // 오늘이 해당 월에 속하면 오늘 날짜 기준, 아니면 무조건 마지막 날 지남으로 처리
+    
+    // 현재 월이거나 과거 월인 경우에만 마지막 날이 지났다고 판단
     if (isCurrentMonth) {
       setIsLastDayPassed(today > lastDay);
-    } else {
+    } else if (today.getFullYear() > year || (today.getFullYear() === year && today.getMonth() + 1 > mm)) {
       setIsLastDayPassed(true);
+    } else {
+      setIsLastDayPassed(false);
     }
   };
 
@@ -160,53 +153,11 @@ const Calendar = () => {
   // FullCalendar의 month 변경 이벤트 핸들러
   const handleDatesSet = (arg: any) => {
     const start = arg.start;
-    const month = start.toISOString().slice(0, 7); // 'YYYY-MM'
-    setCurrentMonth(month); // 항상 현재 월 갱신
+    const month = start.toISOString().slice(0, 7);
+    setCurrentMonth(month);
     fetchCalendarData(month);
     fetchMonthlyMusic(month);
     checkLastDayPassed(month);
-  };
-
-  // 음악 플레이어 관련 핸들러 (Chat.tsx 참고)
-  useEffect(() => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
-    }
-  }, [isPlaying]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setDuration(audio.duration);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-  }, [monthlyMusicUrl]);
-
-  const handlePlayPause = () => setIsPlaying(!isPlaying);
-  const handleSkipForward = () => {
-    if (!audioRef.current) return;
-    const newTime = Math.min(currentTime + 10, duration);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-  const handleSkipBackward = () => {
-    if (!audioRef.current) return;
-    const newTime = Math.max(currentTime - 10, 0);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // 이미지 스타일을 설정하는 함수
@@ -229,28 +180,25 @@ const Calendar = () => {
   const eventContent = (eventInfo: any) => {
     const customContent = document.createElement('div');
     customContent.style.position = 'relative';
-    customContent.style.backgroundColor = 'transparent'; // 배경색 제거
+    customContent.style.backgroundColor = 'transparent';
   
-    // 감정 아이콘 (왼쪽)
     const emotionImgSrc = getEmotionImg(eventInfo.event.extendedProps.emojiImg);
     if (emotionImgSrc) {
       const emojiImg = createImageElement(emotionImgSrc, 'absolute', '24px', '24px', '0', '2px');
       customContent.appendChild(emojiImg);
     }
-    // 음표 아이콘 (오른쪽)
     const noteImgSrc = getNoteImg(eventInfo.event.extendedProps.voteImg);
     if (noteImgSrc) {
       const voteImg = createImageElement(noteImgSrc, 'absolute', '24px', '24px', '0', '28px');
       customContent.appendChild(voteImg);
     }
-    // (필요시 텍스트 등 추가)
     return { domNodes: [customContent] };
   };
 
   // 날짜 클릭 시 상세 정보 조회
   const handleDateClick = async (info: any) => {
-    setSelectedDate(info.dateStr); // 클릭된 날짜 저장
-    setIsModalOpen(true); // 팝업 열기
+    setSelectedDate(info.dateStr);
+    setIsModalOpen(true);
     setIsDetailLoading(true);
     setDayDetail(null);
     setDetailError(null);
@@ -282,17 +230,19 @@ const Calendar = () => {
 
   // 월간 음악 생성 요청
   const handleGenerateMonthlyMusic = async () => {
-    // 현재 월의 마지막 날짜를 즉시 계산
     const [year, mm] = currentMonth.split('-').map(Number);
     const lastDay = new Date(year, mm, 0);
     const today = new Date();
     const isCurrentMonth = today.getFullYear() === year && (today.getMonth() + 1) === mm;
-    const lastDayPassed = isCurrentMonth ? today > lastDay : true;
+    
+    // 현재 월이거나 과거 월인 경우에만 음악 생성 가능
+    const canGenerateMusic = isCurrentMonth ? today > lastDay : today.getFullYear() > year || (today.getFullYear() === year && today.getMonth() + 1 > mm);
 
-    if (!lastDayPassed) {
+    if (!canGenerateMusic) {
       alert('아직 기록할 날들이 남아있어. 조금만 더 함께해줘!');
       return;
     }
+
     const token = localStorage.getItem('accessToken');
     try {
       setIsLoadingMusic(true);
@@ -304,9 +254,6 @@ const Calendar = () => {
       });
       if (res.data.header?.resultCode === 1000 && res.data.body?.music) {
         setMonthlyMusicUrl(res.data.body.music);
-        setIsPlaying(false);
-        setCurrentTime(0);
-        setDuration(0);
         alert('음악이 성공적으로 생성되었습니다!');
       } else {
         alert(res.data.header?.resultMsg || '음악 생성에 실패했습니다.');
@@ -316,48 +263,6 @@ const Calendar = () => {
     } finally {
       setIsLoadingMusic(false);
     }
-  };
-
-  // 팝업 음악 플레이어 핸들러
-  React.useEffect(() => {
-    if (!popupAudioRef.current) return;
-    if (popupIsPlaying) {
-      popupAudioRef.current.play();
-    } else {
-      popupAudioRef.current.pause();
-    }
-  }, [popupIsPlaying, dayDetail?.music]);
-
-  React.useEffect(() => {
-    const audio = popupAudioRef.current;
-    if (!audio) return;
-    const handleTimeUpdate = () => setPopupCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setPopupDuration(audio.duration);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-  }, [dayDetail?.music]);
-
-  const handlePopupPlayPause = () => setPopupIsPlaying(!popupIsPlaying);
-  const handlePopupSkipForward = () => {
-    if (!popupAudioRef.current) return;
-    const newTime = Math.min(popupCurrentTime + 10, popupDuration);
-    popupAudioRef.current.currentTime = newTime;
-    setPopupCurrentTime(newTime);
-  };
-  const handlePopupSkipBackward = () => {
-    if (!popupAudioRef.current) return;
-    const newTime = Math.max(popupCurrentTime - 10, 0);
-    popupAudioRef.current.currentTime = newTime;
-    setPopupCurrentTime(newTime);
-  };
-  const formatPopupTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // 아바타/감정 아이콘 경로 변환
@@ -377,13 +282,12 @@ const Calendar = () => {
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             height="426px"
-            events={events} // 이벤트 전달
-            eventContent={eventContent} // 이벤트 콘텐츠 커스터마이징
-            dateClick={handleDateClick} // 올바르게 dateClick 이벤트 핸들러 추가
-            datesSet={handleDatesSet} // 월 변경 감지 핸들러 추가
+            events={events}
+            eventContent={eventContent}
+            dateClick={handleDateClick}
+            datesSet={handleDatesSet}
             headerToolbar={{
               left: "title",
-              // center: "title",
               right: "today prev,next"
             }}
           />
