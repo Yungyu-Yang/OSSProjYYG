@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import logo from '../assets/logo.png';
+import logo from '/assets/etc/logo.png';
 import { useNavigate } from 'react-router-dom';
 
 export default function SignUp() {
@@ -12,6 +12,8 @@ export default function SignUp() {
   const [isNameAvailable, setIsNameAvailable] = useState<null | boolean>(null);
   const [isEmailAvailable, setIsEmailAvailable] = useState<null | boolean>(null);
   const [loading, setLoading] = useState(false); // 로딩 상태
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalMessage, setCustomModalMessage] = useState('');
 
   {/* 회원가입 */}
   const handleSignUp = async () => {
@@ -32,8 +34,9 @@ export default function SignUp() {
         }
       );
       if (response.data.header?.resultCode === 1000) {
-        alert(response.data.header.resultMsg || '회원가입에 성공했습니다!');
-        navigate('/home');
+        setCustomModalMessage('회원이 되신걸 축하드려요!');
+        setCustomModalOpen(true);
+        navigate('/signin');
       } else {
         alert(response.data.header.resultMsg || '회원가입에 실패했습니다.');
       }
@@ -63,7 +66,7 @@ export default function SignUp() {
       );
       const resultCode = response.data.header?.resultCode;
       const resultMsg = response.data.header?.resultMsg;
-      alert(resultMsg);
+      // alert(resultMsg);
       if (resultCode === 1000) {
         setIsNameAvailable(true);
       } else {
@@ -100,7 +103,7 @@ export default function SignUp() {
       );
       const resultCode = response.data.header?.resultCode;
       const resultMsg = response.data.header?.resultMsg;
-      alert(resultMsg);
+      // alert(resultMsg);
       if (resultCode === 1000) {
         setIsEmailAvailable(true);
       } else {
@@ -122,6 +125,19 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf8] p-4">
+      {customModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-[#FFF1E6] rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-xl">
+            <p className="text-lg mb-4">{customModalMessage}</p>
+            <button
+              className="mt-2 px-4 py-2 bg-[#FF8A65] text-white rounded-xl hover:bg-[#e56e4f]"
+              onClick={() => setCustomModalOpen(false)}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 로고 */}
       <div className="flex flex-col items-center mb-8">

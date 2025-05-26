@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundImage from '../assets/background.png';
+import backgroundImage from '/assets/etc/background.png';
 import axios from 'axios';
 
 const Home = () => {

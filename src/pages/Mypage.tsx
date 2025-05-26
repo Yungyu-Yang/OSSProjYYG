@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import avatarDefault from '../assets/avatar/avatar1.png';
 
 // 아바타 파일명에 맞는 이미지 src 반환
 function getAvatarSrc(anoImg: string | undefined) {
-  if (!anoImg) return avatarDefault;
-  let fileName = anoImg.split('/').pop() || '';
-  fileName = fileName.replace(/\.jpg$/, '.png');
-  const avatarImages = import.meta.glob('../assets/avatar/*.png', { eager: true, as: 'url' });
-  const path = `../assets/avatar/${fileName}`;
-  return avatarImages[path] || avatarDefault;
+  if (!anoImg) return "/assets/avatar/avatar1.png"; // 기본 경로
+  let fileName = anoImg.split("/").pop() || "";
+  fileName = fileName.replace(/\.jpg$/, ".png");
+  return `/assets/avatar/${fileName}`;
 }
-
 export default function MyPage() {
   const navigate = useNavigate();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -20,6 +16,8 @@ export default function MyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [withdrawLoading, setWithdrawLoading] = useState(false);
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalMessage, setCustomModalMessage] = useState('');
 
   useEffect(() => {
     const fetchMypage = async () => {
@@ -64,7 +62,8 @@ export default function MyPage() {
         }
       );
       if (response.data.header?.resultCode === 1000) {
-        alert(response.data.header.resultMsg || '회원 탈퇴에 성공하였습니다.');
+        setCustomModalMessage('회원탈퇴에 성공했습니다! 다음에 꼭 다시 만나요!');
+        setCustomModalOpen(true);
         navigate('/');
       } else {
         alert(response.data.header?.resultMsg || '회원 탈퇴에 실패하였습니다.');
@@ -91,6 +90,20 @@ export default function MyPage() {
 
   return (
     <div className="flex justify-center bg-[#fffdf8] pt-[50px] min-h-screen">
+      {customModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-[#FFF1E6] rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-xl">
+            <p className="text-lg mb-4">{customModalMessage}</p>
+            <button
+              className="mt-2 px-4 py-2 bg-[#FF8A65] text-white rounded-xl hover:bg-[#e56e4f]"
+              onClick={() => setCustomModalOpen(false)}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="flex-1 p-8 max-w-[900px] w-full ml-[50px]">
         <div className="flex items-center mb-8 w-full max-w-[700px]">
