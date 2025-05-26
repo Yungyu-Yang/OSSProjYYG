@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { PiMicrophoneBold, PiArrowRight, PiPlay, PiPause, PiSkipBack, PiSkipForward } from "react-icons/pi";
 import axios from "axios";
+import MusicPlayer from '../components/MusicPlayer';
 
 // 프로그레스 바 애니메이션 스타일
 const progressBarStyles = `
@@ -501,42 +502,8 @@ const handleGenerateMusicByStyleAgain = () => {
               </div>
             </div>
           ) : musicUrl ? (
-            <div className="flex items-center space-x-4 w-full">
-              <audio ref={audioRef} src={musicUrl} />
-              <button
-                onClick={handleSkipBackward}
-                className="text-white bg-[#E29578] p-2 rounded-full"
-                title="10초 뒤로"
-              >
-                <PiSkipBack size={20} />
-              </button>
-              <button
-                onClick={handlePlayPause}
-                className="text-white bg-[#E29578] p-4 rounded-full"
-                title={isPlaying ? "일시정지" : "재생"}
-              >
-                {isPlaying ? <PiPause size={24} /> : <PiPlay size={24} />}
-              </button>
-              <button
-                onClick={handleSkipForward}
-                className="text-white bg-[#E29578] p-2 rounded-full"
-                title="10초 앞으로"
-              >
-                <PiSkipForward size={20} />
-              </button>
-              <div className="flex-1">
-                <div className="w-full bg-[#FFD6C4] h-2 rounded-full overflow-hidden">
-                  <div
-                    className="bg-[#FF867C] h-full"
-                    style={{ width: `${(currentTime / duration) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-sm mt-1 text-[#7C6F62]">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(duration)}</span>
-                </div>
-              </div>
-
+            <div className="flex flex-col items-center w-full">
+              <MusicPlayer src={musicUrl} />
               {showSaveAndRetry && !isMusicSaved && (
                 <div className="flex justify-center gap-4 mt-2">
                   <button

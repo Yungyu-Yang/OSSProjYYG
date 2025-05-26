@@ -1,15 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { PiHouseBold, PiChatCircleBold, PiDresserBold, PiSmileyBold, PiUserBold } from 'react-icons/pi';
 import logo from '../assets/logo.png';
-import avatar from '../assets/avatar/avatar1.png';
+import avatarDefault from '../assets/avatar/avatar1.png';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+// 아바타 파일명에 맞는 이미지 src 반환
+function getAvatarSrc(anoImg: string | undefined) {
+  if (!anoImg) return avatarDefault;
+  let fileName = anoImg.split('/').pop() || '';
+  fileName = fileName.replace(/\.jpg$/, '.png');
+  const avatarImages = import.meta.glob('../assets/avatar/*.png', { eager: true, as: 'url' });
+  const path = `../assets/avatar/${fileName}`;
+  return avatarImages[path] || avatarDefault;
+}
 
 const Sidebar = () => {
-
   const navigate = useNavigate();
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -18,12 +28,33 @@ const Sidebar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem("accessToken");
+      try {
+        const response = await axios.get("http://localhost:8080/user/mypage", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          withCredentials: true,
+        });
+
+        if (response.data.header?.resultCode === 1000) {
+          setUserInfo(response.data.body);
+        }
+      } catch (error) {
+        console.error("사용자 정보 조회 실패:", error);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   return (
     <div className="flex flex-col w-20 bg-[rgba(255,232,214,0.8)] text-white min-h-screen z-10">
       <div className="flex justify-center py-3">
         <Link to="/" className="block p-3">
-        <img src={logo} className="w-20 max-w-none" />
+          <img src={logo} alt="로고" className="w-20 max-w-none" />
         </Link>
       </div>
 
@@ -55,8 +86,6 @@ const Sidebar = () => {
         </li>
       </ul>
 
-
-
       <div className="mt-auto relative" style={{ borderTop: "0.5px solid #FFB3AB" }}>
         <div className="flex justify-center p-3">
           <button
@@ -64,8 +93,13 @@ const Sidebar = () => {
             style={{ backgroundColor: 'rgba(255, 179, 171, 0.5)' }}
             role="button"
             onClick={toggleDropdown}
+            title="프로필 메뉴"
           >
-            <img src={avatar}/>
+            <img 
+              src={getAvatarSrc(userInfo?.anoImg)} 
+              alt="프로필 이미지" 
+              className="w-full h-full object-cover rounded-full" 
+            />
           </button>
         </div>
 
@@ -77,7 +111,6 @@ const Sidebar = () => {
           </div>
         )}
       </div>
-
     </div>
   );
 };
