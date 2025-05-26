@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import logo from '../assets/logo.png';
+import logo from '/assets/etc/logo.png';
 import axios from 'axios';
 
 export default function EditProfile() {
@@ -9,6 +9,8 @@ export default function EditProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalMessage, setCustomModalMessage] = useState('');
 
   // 회원 정보 불러오기
   useEffect(() => {
@@ -60,7 +62,8 @@ export default function EditProfile() {
         }
       );
       if (response.data.header?.resultCode === 1000) {
-        alert(response.data.header.resultMsg || '회원 정보가 성공적으로 수정되었습니다!');
+        setCustomModalMessage('회원 정보가 성공적으로 수정되었습니다!');
+        setCustomModalOpen(true);
       } else {
         alert(response.data.header?.resultMsg || '회원 정보 수정에 실패했습니다.');
       }
@@ -86,6 +89,20 @@ export default function EditProfile() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf8] p-4">
+      {customModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-[#FFF1E6] rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-xl">
+            <p className="text-lg mb-4">{customModalMessage}</p>
+            <button
+              className="mt-2 px-4 py-2 bg-[#FF8A65] text-white rounded-xl hover:bg-[#e56e4f]"
+              onClick={() => setCustomModalOpen(false)}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
 
       {/* 로고 */}
       <div className="flex flex-col items-center mb-8">

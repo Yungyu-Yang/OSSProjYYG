@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-import lockIcon from '../assets/avatar/lock.png';
-import avatar1 from '../assets/avatar/avatar1.png';
-import avatar2 from '../assets/avatar/avatar2.png';
-import avatar3 from '../assets/avatar/avatar3.png';
-import avatar4 from '../assets/avatar/avatar4.png';
-import avatar5 from '../assets/avatar/avatar5.png';
-import avatar6 from '../assets/avatar/avatar6.png';
-import avatar7 from '../assets/avatar/avatar7.png';
-import avatar8 from '../assets/avatar/avatar8.png';
-import avatar9 from '../assets/avatar/avatar9.png';
-import avatar10 from '../assets/avatar/avatar10.png';
+import lockIcon from '/assets/etc/lock.png';
+import avatar1 from '/assets/avatar/avatar1.png';
+import avatar2 from '/assets/avatar/avatar2.png';
+import avatar3 from '/assets/avatar/avatar3.png';
+import avatar4 from '/assets/avatar/avatar4.png';
+import avatar5 from '/assets/avatar/avatar5.png';
+import avatar6 from '/assets/avatar/avatar6.png';
+import avatar7 from '/assets/avatar/avatar7.png';
+import avatar8 from '/assets/avatar/avatar8.png';
+import avatar9 from '/assets/avatar/avatar9.png';
+import avatar10 from '/assets/avatar/avatar10.png';
 
 interface AvatarItemData {
   id: string;
@@ -24,9 +24,9 @@ interface AvatarItemData {
 const avatarItemsDefault: AvatarItemData[] = [
   { id: '1', name: '맴미', src: avatar1, hashtag: '# 산만 # 쾌활', unlocked: false },
   { id: '2', name: '뿌우', src: avatar2, hashtag: '# 침착 # 순수', unlocked: false },
-  { id: '3', name: '늘보', src: avatar3, hashtag: '# 똑똑 # 차분', unlocked: false },
-  { id: '4', name: '꽉꽉', src: avatar4, hashtag: '# 시끌 # 깨끗', unlocked: false },
-  { id: '5', name: '짹짹', src: avatar5, hashtag: '# 밝음 # 반짝', unlocked: false },
+  { id: '3', name: '늘이', src: avatar3, hashtag: '# 똑똑 # 차분', unlocked: false },
+  { id: '4', name: '꽉꽉', src: avatar4, hashtag: '# 시끌 # 쾌활', unlocked: false },
+  { id: '5', name: '삑삑', src: avatar5, hashtag: '# 밝음 # 반장', unlocked: false },
   { id: '6', name: '먐미', src: avatar6, hashtag: '# 시크 # 도도', unlocked: false },
   { id: '7', name: '멈무', src: avatar7, hashtag: '# 애교 # 행복', unlocked: false },
   { id: '8', name: '끼순', src: avatar8, hashtag: '# 시끌 # 산만', unlocked: false },
@@ -42,10 +42,12 @@ const AvatarGrid: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attend, setAttend] = useState(0); // 출석일수
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalMessage, setCustomModalMessage] = useState('');
+
 
   // accessToken
   const accessToken = localStorage.getItem('accessToken');
-  const uno = localStorage.getItem('uno');
 
   useEffect(() => {
     const fetchAvatarData = async () => {
@@ -90,7 +92,6 @@ const AvatarGrid: React.FC = () => {
         const selectedAno = selectRes.data.body?.ano?.toString();
         setSelectedId(selectedAno);
 
-        // 잠금 해제 로직: 맴미/뿌우 기본 해제, 이후 10일마다 1개씩 오픈
         const unlockedCount = 2 + Math.floor((userBody.attend || 0) / 10);
         const newAvatars = avatarItemsDefault.map((item, idx) => {
           // 서버에서 받은 잠금 정보가 있으면 우선 적용
@@ -129,8 +130,11 @@ const AvatarGrid: React.FC = () => {
           withCredentials: true,
         }
       );
+
+      console.log("응답 결과 : ", response.data);
       if (response.data.header?.resultCode === 1000) {
-        alert('아바타가 변경되었습니다!');
+        setCustomModalMessage('아바타가 변경되었습니다!');
+        setCustomModalOpen(true);
       } else {
         alert(response.data.header?.resultMsg || '아바타 변경에 실패했습니다.');
       }
@@ -151,6 +155,19 @@ const AvatarGrid: React.FC = () => {
 
   return (
     <Wrapper>
+      {customModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-[#FFF1E6] rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-xl">
+            <p className="text-lg mb-4">{customModalMessage}</p>
+            <button
+              className="mt-2 px-4 py-2 bg-[#FF8A65] text-white rounded-xl hover:bg-[#e56e4f]"
+              onClick={() => setCustomModalOpen(false)}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
       <Grid>
         {avatars.map(({ id, name, src, hashtag, unlocked }) => {
           const isSelected = selectedId === id;

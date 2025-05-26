@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { PiHouseBold, PiChatCircleBold, PiDresserBold, PiSmileyBold, PiUserBold } from 'react-icons/pi';
-import logo from '../assets/logo.png';
-import avatarDefault from '../assets/avatar/avatar1.png';
+import logo from '/assets/etc/logo.png';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 // 아바타 파일명에 맞는 이미지 src 반환
 function getAvatarSrc(anoImg: string | undefined) {
-  if (!anoImg) return avatarDefault;
-  let fileName = anoImg.split('/').pop() || '';
-  fileName = fileName.replace(/\.jpg$/, '.png');
-  const avatarImages = import.meta.glob('../assets/avatar/*.png', { eager: true, as: 'url' });
-  const path = `../assets/avatar/${fileName}`;
-  return avatarImages[path] || avatarDefault;
+  if (!anoImg) return "/assets/avatar/avatar1.png"; // 기본 경로
+  let fileName = anoImg.split("/").pop() || "";
+  fileName = fileName.replace(/\.jpg$/, ".png");
+  return `/assets/avatar/${fileName}`;
 }
+
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -40,6 +38,7 @@ const Sidebar = () => {
         });
 
         if (response.data.header?.resultCode === 1000) {
+          console.log("userInfo : ", response.data);
           setUserInfo(response.data.body);
         }
       } catch (error) {

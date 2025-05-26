@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { PiMicrophoneBold, PiArrowRight, PiPlay, PiPause, PiSkipBack, PiSkipForward } from "react-icons/pi";
+import { PiMicrophoneBold, PiArrowRight} from "react-icons/pi";
 import axios from "axios";
 import MusicPlayer from '../components/MusicPlayer';
 
@@ -209,33 +209,6 @@ const handleGenerateMusicByStyleAgain = () => {
     }
     return () => clearInterval(timer);
   }, [isPlaying, currentTime, duration]);
-
-  // 시간을 "분:초" 형식으로 포맷팅
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  // 플레이/일시정지 버튼 클릭 시 상태 전환
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleSkipForward = () => {
-    if (!audioRef.current) return;
-    const newTime = Math.min(currentTime + 10, duration);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
-  const handleSkipBackward = () => {
-    if (!audioRef.current) return;
-    const newTime = Math.max(currentTime - 10, 0);
-    audioRef.current.currentTime = newTime;
-    setCurrentTime(newTime);
-  };
-
 
   useEffect(() => {
     const fetchChats = async () => {

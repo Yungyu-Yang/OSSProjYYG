@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundImage from '../assets/background.png';
-import logo from '../assets/logo.png';
+import backgroundImage from '/assets/etc/background.png';
+import logo from '/assets/etc/logo.png';
 
 const Start = () => {
 

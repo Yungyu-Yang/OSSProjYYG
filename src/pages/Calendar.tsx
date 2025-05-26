@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import avatar from '../assets/avatar/avatar1.png';
+import avatar from '/assets/avatar/avatar1.png';
 import { PiXCircle } from 'react-icons/pi';
 import axios from 'axios';
 import MusicPlayer from '../components/MusicPlayer';
@@ -40,6 +40,8 @@ const Calendar = () => {
   const [detailError, setDetailError] = useState<string | null>(null);
   // 회원 아바타 이미지 상태
   const [userAvatar, setUserAvatar] = useState<string>(avatar);
+  const [customModalOpen, setCustomModalOpen] = useState(false);
+  const [customModalMessage, setCustomModalMessage] = useState('');
 
   // 월별 데이터 불러오기 함수
   const fetchCalendarData = async (month: string) => {
@@ -52,9 +54,13 @@ const Calendar = () => {
         withCredentials: true,
       });
       if (res.data.header?.resultCode === 1000) {
+        console.log(res.data);
         // dates 배열을 FullCalendar 이벤트로 변환
+        const imgPath = res.data.body.anoimg;
+        setUserAvatar(`/assets/avatar/${imgPath.split('/').pop()}`);
+
         const body = res.data.body;
-        const avatarImg = body.anomg;
+        const avatarImg = body.anoimg;
         const dates = body.dates || [];
         const newEvents = dates.map((dateObj: any) => ({
           date: dateObj.created_at,
@@ -89,6 +95,7 @@ const Calendar = () => {
         withCredentials: true,
       });
       if (res.data.header?.resultCode === 1000 && res.data.body?.music) {
+        console.log("월간 음악 정보 : ", res.data);
         setMonthlyMusicUrl(res.data.body.music);
       } else {
         setMonthlyMusicUrl(null);
@@ -127,28 +134,6 @@ const Calendar = () => {
     checkLastDayPassed(month);
   }, []);
 
-  // 회원 정보에서 아바타 이미지 가져오기
-  useEffect(() => {
-    const fetchUserAvatar = async () => {
-      const token = localStorage.getItem('accessToken');
-      try {
-        const res = await axios.get('http://localhost:8080/user/mypage', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true,
-        });
-        if (res.data.header?.resultCode === 1000 && res.data.body?.anoImg) {
-          // public/assets/avatar/ 경로로 맞추기
-          const imgPath = res.data.body.anoImg;
-          setUserAvatar(`/assets/avatar/${imgPath.split('/').pop()}`);
-        }
-      } catch (err) {
-        // 실패 시 기본 아바타 유지
-      }
-    };
-    fetchUserAvatar();
-  }, []);
 
   // FullCalendar의 month 변경 이벤트 핸들러
   const handleDatesSet = (arg: any) => {
@@ -184,12 +169,12 @@ const Calendar = () => {
   
     const emotionImgSrc = getEmotionImg(eventInfo.event.extendedProps.emojiImg);
     if (emotionImgSrc) {
-      const emojiImg = createImageElement(emotionImgSrc, 'absolute', '24px', '24px', '0', '2px');
+      const emojiImg = createImageElement(emotionImgSrc, 'absolute', '60px', '60px', '-25px', '2px');
       customContent.appendChild(emojiImg);
     }
     const noteImgSrc = getNoteImg(eventInfo.event.extendedProps.voteImg);
     if (noteImgSrc) {
-      const voteImg = createImageElement(noteImgSrc, 'absolute', '24px', '24px', '0', '28px');
+      const voteImg = createImageElement(noteImgSrc, 'absolute', '30px', '30px', '-12px', '50px');
       customContent.appendChild(voteImg);
     }
     return { domNodes: [customContent] };
@@ -211,6 +196,7 @@ const Calendar = () => {
         withCredentials: true,
       });
       if (res.data.header?.resultCode === 1000 && res.data.body) {
+        console.log(res.data);
         setDayDetail(res.data.body);
       } else {
         setDayDetail(null);
@@ -224,10 +210,6 @@ const Calendar = () => {
     }
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
   // 월간 음악 생성 요청
   const handleGenerateMonthlyMusic = async () => {
     const [year, mm] = currentMonth.split('-').map(Number);
@@ -239,9 +221,11 @@ const Calendar = () => {
     const canGenerateMusic = isCurrentMonth ? today > lastDay : today.getFullYear() > year || (today.getFullYear() === year && today.getMonth() + 1 > mm);
 
     if (!canGenerateMusic) {
-      alert('아직 기록할 날들이 남아있어. 조금만 더 함께해줘!');
+      setCustomModalMessage('아직 기록할 날들이 남아있어. 조금만 더 함께해줘!');
+      setCustomModalOpen(true);
       return;
     }
+
 
     const token = localStorage.getItem('accessToken');
     try {
@@ -254,12 +238,14 @@ const Calendar = () => {
       });
       if (res.data.header?.resultCode === 1000 && res.data.body?.music) {
         setMonthlyMusicUrl(res.data.body.music);
-        alert('음악이 성공적으로 생성되었습니다!');
+        console.log('음악이 성공적으로 생성되었습니다!');
       } else {
-        alert(res.data.header?.resultMsg || '음악 생성에 실패했습니다.');
+        console.log(res.data.header?.resultMsg || '음악 생성에 실패했습니다.');
       }
     } catch (err) {
-      alert('음악 생성 중 오류가 발생했습니다.');
+      console.log('음악 생성 중 오류가 발생했습니다.');
+      console.log(err);
+      
     } finally {
       setIsLoadingMusic(false);
     }
@@ -269,7 +255,21 @@ const Calendar = () => {
   const getAvatarImg = (imgPath: string | undefined) => imgPath ? `/assets/avatar/${imgPath.split('/').pop()}` : undefined;
 
   return (
-    <div className="p-[30px] min-h-screen bg-[#FFFDF8] max-h-screen">
+    <div className="p-[30px] min-h-screen bg-[#FFFDF8] max-h-screen overflow-y-auto">
+      {customModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-[#FFF1E6] rounded-2xl p-6 w-[90%] max-w-[400px] text-center shadow-xl">
+            <p className="text-lg mb-4">{customModalMessage}</p>
+            <button
+              className="mt-2 px-4 py-2 bg-[#FF8A65] text-white rounded-xl hover:bg-[#e56e4f]"
+              onClick={() => setCustomModalOpen(false)}
+            >
+              확인
+            </button>
+          </div>
+        </div>
+      )}
+
       <style>{calendarStyles}</style>
       <div className="flex items-center">
         <img src={userAvatar} alt="Avatar" className="w-16 h-16 rounded-full bg-[#DDDBD5] bg-opacity-80 object-cover ml-5" />
@@ -297,7 +297,7 @@ const Calendar = () => {
       {/* 팝업 창 */}
       {isModalOpen && (
         <div className="fixed inset-0 flex justify-center items-start bg-black bg-opacity-50 z-50 pt-[30px]">
-          <main className="bg-[#F9F7F2] rounded-3xl p-6 w-[80%] max-w-[1000px] max-h-[90vh] overflow-y-auto flex flex-col relative z-50 pt-0">
+          <main className="bg-[#F9F7F2] rounded-3xl p-6 w-[80%] max-w-[1000px] max-h-[90vh] overflow-y-auto flex flex-col relative z-50 pt-0 pb-12">
             {/* 선택한 날짜와 상세 정보 표시 */}
             <div className="flex justify-between items-center space-x-4 mt-6 ml-10">
               <div className="flex items-center space-x-4">
@@ -307,11 +307,11 @@ const Calendar = () => {
                   <span className="ml-4">불러오는 중...</span>
                 ) : dayDetail ? (
                   <>
-                    {dayDetail.anomg && (
-                      <img src={getAvatarImg(dayDetail.anomg)} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
-                    )}
-                    {dayDetail.einolmg && (
-                      <img src={getEmotionImg(dayDetail.einolmg)} alt="Emotion" className="w-10 h-10 object-cover" />
+                    {/* {dayDetail.anoImg && (
+                      <img src={getAvatarImg(dayDetail.anoImg)} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
+                    )} */}
+                    {dayDetail.einoImg && (
+                      <img src={getEmotionImg(dayDetail.einoImg)} alt="Emotion" className="w-10 h-10 object-cover" />
                     )}
                   </>
                 ) : null}
@@ -341,30 +341,50 @@ const Calendar = () => {
                             key={idx}
                             className={`flex ${chat.isbot === 1 ? 'justify-start' : 'justify-end'} w-full`}
                           >
-                            <span
-                              className={
-                                (chat.isbot === 1
-                                  ? 'bg-white text-[#333]'
-                                  : 'bg-[#FFE0D2] text-[#333]') +
-                                ' p-5 rounded-xl max-w-[80%] break-words shadow-sm'
-                              }
-                            >
-                              {chat.chat}
-                            </span>
+                            {chat.isbot === 1 ? (
+                              <div className="flex items-start space-x-3">
+                                {/* 아바타 이미지 */}
+                                <div className="w-10 h-10 min-w-[2.5rem] min-h-[2.5rem] rounded-full overflow-hidden flex items-center justify-center">
+                                  <img
+                                    src={getAvatarImg(dayDetail.anoImg)}
+                                    alt="Avatar"
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div className="flex flex-col">
+                                  {/* 아바타 이름 */}
+                                  <div className="text-sm text-gray-600 font-semibold mb-1">{dayDetail.anoName}</div>
+                                  {/* 메시지 내용 */}
+                                  <span className="bg-white text-[#333] p-5 rounded-xl max-w-[80%] break-words shadow-sm">
+                                    {chat.chat}
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex justify-end w-full">
+                                <span className="bg-[#FFE0D2] text-[#333] p-5 rounded-xl max-w-[80%] break-words shadow-sm">
+                                  {chat.chat}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center text-gray-400">채팅 기록이 없습니다.</div>
+                      <div className="text-gray-400 text-sm">대화 기록이 없습니다.</div>
                     )}
+
                   </>
                 ) : null}
               </div>
               {/* 음악 파일 - Chat.tsx 스타일 플레이어 */}
               {dayDetail && dayDetail.music && (
-                <div className="flex justify-center mt-12 mb-10">
-                  <MusicPlayer src={dayDetail.music} />
+                <div className="flex justify-center mt-10 mb-4 px-4">
+                  <div className="w-full max-w-md mb-12">
+                    <MusicPlayer src={dayDetail.music} />
+                  </div>
                 </div>
+
               )}
             </div>
           </main>
@@ -373,7 +393,7 @@ const Calendar = () => {
 
       {/* 월간 음악 플레이어/생성 UI */}
       {monthlyMusicUrl ? (
-        <div className="flex justify-center items-center mt-8 mb-8">
+        <div className="flex justify-center items-center mt-8 mb-2">
           <MusicPlayer src={monthlyMusicUrl} />
         </div>
       ) : (
