@@ -8,13 +8,14 @@ export default function SignIn() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const handleLogin = async () => {
   console.log('📥 로그인 시도:', { email, password }); // 입력값 확인
 
   try {
     const response = await axios.post(
-      'http://localhost:8080/user/login',
+      `${baseURL}/user/login`,
       {
         email,
         password,

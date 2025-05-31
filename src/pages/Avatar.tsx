@@ -34,16 +34,15 @@ const avatarItemsDefault: AvatarItemData[] = [
   { id: '10', name: '코코', src: avatar10, hashtag: '# 침착 # 차분', unlocked: false },
 ];
 
-const API_BASE = 'http://localhost:8080';
-
 const AvatarGrid: React.FC = () => {
   const [avatars, setAvatars] = useState<AvatarItemData[]>(avatarItemsDefault);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [attend, setAttend] = useState(0); // 출석일수
+  const [, setAttend] = useState(0); // 출석일수
   const [customModalOpen, setCustomModalOpen] = useState(false);
   const [customModalMessage, setCustomModalMessage] = useState('');
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 
   // accessToken
@@ -55,7 +54,7 @@ const AvatarGrid: React.FC = () => {
       setError(null);
       try {
         // 출석일수, 선택 아바타 정보
-        const userRes = await axios.get(`${API_BASE}/user/mypage`, {
+        const userRes = await axios.get(`${baseURL}/user/mypage`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         });
@@ -68,7 +67,7 @@ const AvatarGrid: React.FC = () => {
         setAttend(userBody.attend || 0);
 
         // 아바타 잠금 정보
-        const lockRes = await axios.get(`${API_BASE}/user/avatar/lock`, {
+        const lockRes = await axios.get(`${baseURL}/user/avatar/lock`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         });
@@ -80,7 +79,7 @@ const AvatarGrid: React.FC = () => {
         const lockList = lockRes.data.body || [];
 
         // 아바타 선택 정보
-        const selectRes = await axios.get(`${API_BASE}/user/avatar`, {
+        const selectRes = await axios.get(`${baseURL}/user/avatar`, {
           headers: { Authorization: `Bearer ${accessToken}` },
           withCredentials: true,
         });
@@ -123,7 +122,7 @@ const AvatarGrid: React.FC = () => {
     if (!selectedId) return;
     try {
       const response = await axios.patch(
-        `${API_BASE}/user/avatar/change`,
+        `${baseURL}/user/avatar/change`,
         { ano: selectedId },
         {
           headers: { Authorization: `Bearer ${accessToken}` },

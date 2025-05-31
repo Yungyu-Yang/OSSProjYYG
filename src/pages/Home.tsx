@@ -5,6 +5,7 @@ import axios from 'axios';
 
 const Home = () => {
   const navigate = useNavigate();
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const [myAvatarUrl, setMyAvatarUrl] = useState<string>('');
   const [avatarList, setAvatarList] = useState<string[]>([]);
@@ -23,7 +24,7 @@ const Home = () => {
 
     const fetchHomeInfo = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/user/home', {
+        const response = await axios.get(`${baseURL}/user/home`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

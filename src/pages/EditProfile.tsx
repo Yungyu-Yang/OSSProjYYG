@@ -11,6 +11,7 @@ export default function EditProfile() {
   const [updating, setUpdating] = useState(false);
   const [customModalOpen, setCustomModalOpen] = useState(false);
   const [customModalMessage, setCustomModalMessage] = useState('');
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   // 회원 정보 불러오기
   useEffect(() => {
@@ -19,7 +20,7 @@ export default function EditProfile() {
       setError(null);
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await axios.get('http://localhost:8080/user/info', {
+        const response = await axios.get(`${baseURL}/user/info`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -47,7 +48,7 @@ export default function EditProfile() {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await axios.patch(
-        'http://localhost:8080/user/changeinfo',
+        `${baseURL}/user/changeinfo`,
         {
           name,
           email,
