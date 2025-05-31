@@ -45,8 +45,7 @@ const Chat = () => {
   const [anoImg, setAnoImg] = useState("");
   const [anoName, setAnoName] = useState("");
   const [isMusicSaved, setIsMusicSaved] = useState(false);
-
-
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 const handleGenerateMusicByStyleAgain = () => {
   if (lastStyle && lastDescription) {
@@ -63,7 +62,7 @@ const handleGenerateMusicByStyleAgain = () => {
       setAnalyzeResult(null); // 초기화
 
       const res = await axios.post(
-        "http://localhost:8080/music/analyze",
+        `${baseURL}/music/analyze`,
         {},
         {
           headers: {
@@ -99,7 +98,7 @@ const handleGenerateMusicByStyleAgain = () => {
       setIsGenerating(true);
 
       const res = await axios.post(
-        "http://localhost:8080/music/generate",
+        `${baseURL}/music/generate`,
         { style: selectedStyle, description: selectedDescription },
         {
           headers: {
@@ -216,7 +215,7 @@ const handleGenerateMusicByStyleAgain = () => {
       const today = new Date().toLocaleDateString('sv-SE'); 
 
       try {
-        const res = await axios.get(`http://localhost:8080/chat?date=${today}`, {
+        const res = await axios.get(`${baseURL}/chat?date=${today}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -249,7 +248,7 @@ const handleGenerateMusicByStyleAgain = () => {
     const today = new Date().toLocaleDateString('sv-SE'); 
 
     try {
-      const res = await axios.get(`http://localhost:8080/music?date=${today}`, {
+      const res = await axios.get(`${baseURL}/music?date=${today}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -294,7 +293,7 @@ const handleGenerateMusicByStyleAgain = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/chat/text",
+        `${baseURL}/chat/text`,
         { message: userMessage },
         {
           headers: {
@@ -328,7 +327,7 @@ const handleGenerateMusicByStyleAgain = () => {
       formData.append("voice", audioBlob, "recording.m4a");
       const token = localStorage.getItem("accessToken");
 
-      const sttRes = await axios.post("http://localhost:8080/chat/voice", formData,
+      const sttRes = await axios.post(`${baseURL}/chat/voice`, formData,
       {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -369,7 +368,7 @@ const handleGenerateMusicByStyleAgain = () => {
     const today = new Date().toLocaleDateString('sv-SE'); 
     try {
       const response = await axios.post(
-        `http://localhost:8080/music/save?date=${today}`,
+        `${baseURL}/music/save?date=${today}`,
         {},
         {
           headers: {

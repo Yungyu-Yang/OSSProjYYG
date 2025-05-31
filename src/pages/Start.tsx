@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import backgroundImage from '/assets/etc/background.png';
 import logo from '/assets/etc/logo.png';
@@ -11,14 +11,12 @@ const Start = () => {
 
   useEffect(() => {
 
-    const loadAvatars = async () => {
-      const avatars = await Promise.all(
-        Array.from({ length: 10 }, (_, i) => import(`/assets/avatar/avatar${i + 1}.png`))
-      );
-      setAvatarList(avatars.map((avatar) => avatar.default)); 
+    const loadAllAvatars = () => {
+      const all = Array.from({ length: 10 }, (_, i) => `/assets/avatar/avatar${i + 1}.png`);
+      setAvatarList(all);
     };
 
-    loadAvatars();
+    loadAllAvatars();
   }, []);
 
   return (

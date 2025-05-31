@@ -18,6 +18,7 @@ export default function MyPage() {
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [customModalOpen, setCustomModalOpen] = useState(false);
   const [customModalMessage, setCustomModalMessage] = useState('');
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const fetchMypage = async () => {
@@ -25,7 +26,7 @@ export default function MyPage() {
       setError(null);
       try {
         const token = localStorage.getItem('accessToken');
-        const response = await axios.get('http://localhost:8080/user/mypage', {
+        const response = await axios.get(`${baseURL}/user/mypage`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -51,7 +52,7 @@ export default function MyPage() {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await axios.patch(
-        'http://localhost:8080/user/withdraw',
+        `${baseURL}/user/withdraw`,
         {},
         {
           headers: {

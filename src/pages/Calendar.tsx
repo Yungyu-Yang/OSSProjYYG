@@ -32,7 +32,7 @@ const Calendar = () => {
   const [events, setEvents] = useState<any[]>([]); // 월별 이벤트 상태
   const [currentMonth, setCurrentMonth] = useState<string>(''); // 현재 월 상태
   const [monthlyMusicUrl, setMonthlyMusicUrl] = useState<string | null>(null);
-  const [isLastDayPassed, setIsLastDayPassed] = useState(false);
+  const [, setIsLastDayPassed] = useState(false);
   const [isLoadingMusic, setIsLoadingMusic] = useState(false);
   // 하루 기록 상세 정보 상태
   const [dayDetail, setDayDetail] = useState<any | null>(null);
@@ -42,12 +42,13 @@ const Calendar = () => {
   const [userAvatar, setUserAvatar] = useState<string>(avatar);
   const [customModalOpen, setCustomModalOpen] = useState(false);
   const [customModalMessage, setCustomModalMessage] = useState('');
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   // 월별 데이터 불러오기 함수
   const fetchCalendarData = async (month: string) => {
     const token = localStorage.getItem('accessToken');
     try {
-      const res = await axios.get(`http://localhost:8080/calendar?month=${month}`, {
+      const res = await axios.get(`${baseURL}/calendar?month=${month}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -88,7 +89,7 @@ const Calendar = () => {
     setMonthlyMusicUrl(null);
     const token = localStorage.getItem('accessToken');
     try {
-      const res = await axios.get(`http://localhost:8080/calendar/music?month=${month}`, {
+      const res = await axios.get(`${baseURL}/calendar/music?month=${month}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -136,9 +137,17 @@ const Calendar = () => {
 
 
   // FullCalendar의 month 변경 이벤트 핸들러
+  // const handleDatesSet = (arg: any) => {
+  //   const start = arg.start;
+  //   const month = start.toISOString().slice(0, 7);
+  //   setCurrentMonth(month);
+  //   fetchCalendarData(month);
+  //   fetchMonthlyMusic(month);
+  //   checkLastDayPassed(month);
+  // };
   const handleDatesSet = (arg: any) => {
-    const start = arg.start;
-    const month = start.toISOString().slice(0, 7);
+    const month = arg.view.currentStart.toISOString().slice(0, 7); 
+    console.log('month : ', month)
     setCurrentMonth(month);
     fetchCalendarData(month);
     fetchMonthlyMusic(month);
@@ -189,7 +198,7 @@ const Calendar = () => {
     setDetailError(null);
     const token = localStorage.getItem('accessToken');
     try {
-      const res = await axios.get(`http://localhost:8080/calendar/detail?date=${info.dateStr}`, {
+      const res = await axios.get(`${baseURL}/calendar/detail?date=${info.dateStr}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -230,7 +239,7 @@ const Calendar = () => {
     const token = localStorage.getItem('accessToken');
     try {
       setIsLoadingMusic(true);
-      const res = await axios.post('http://localhost:8080/calendar/music/generate', {}, {
+      const res = await axios.post(`${baseURL}/calendar/music/generate`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

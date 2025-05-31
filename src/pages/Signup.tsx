@@ -14,13 +14,14 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false); // 로딩 상태
   const [customModalOpen, setCustomModalOpen] = useState(false);
   const [customModalMessage, setCustomModalMessage] = useState('');
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   {/* 회원가입 */}
   const handleSignUp = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'http://localhost:8080/user/signup',
+        `${baseURL}/user/signup`,
         {
           name,
           email,
@@ -58,14 +59,13 @@ export default function SignUp() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8080/user/checkname`,
+        `${baseURL}/user/checkname`,
         {
           params: { name },
           withCredentials: true,
         }
       );
       const resultCode = response.data.header?.resultCode;
-      const resultMsg = response.data.header?.resultMsg;
 
       if (resultCode === 1000) {
         setIsNameAvailable(true);
@@ -95,14 +95,13 @@ export default function SignUp() {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:8080/user/checkemail`,
+        `${baseURL}/user/checkemail`,
         {
           params: { email },
           withCredentials: true,
         }
       );
       const resultCode = response.data.header?.resultCode;
-      const resultMsg = response.data.header?.resultMsg;
 
       if (resultCode === 1000) {
         setIsEmailAvailable(true);

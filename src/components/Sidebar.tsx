@@ -18,6 +18,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(null);
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -30,7 +31,7 @@ const Sidebar = () => {
     const fetchUserInfo = async () => {
       const token = localStorage.getItem("accessToken");
       try {
-        const response = await axios.get("http://localhost:8080/user/mypage", {
+        const response = await axios.get(`${baseURL}/user/mypage`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
