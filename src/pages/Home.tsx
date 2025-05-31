@@ -14,7 +14,7 @@ const Home = () => {
     const uno = localStorage.getItem('uno');
 
     if (!token || !uno) {
-      alert('로그인이 필요합니다.');
+      console.log('로그인이 필요합니다.');
       navigate('/signin');
       return;
     }
@@ -38,7 +38,7 @@ const Home = () => {
 
       } catch (error) {
         console.error('❌ 홈 정보 조회 실패:', error);
-        alert('홈 정보를 불러오지 못했습니다.');
+        console.log('홈 정보를 불러오지 못했습니다.');
       }
     };
 

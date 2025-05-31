@@ -52,7 +52,7 @@ const handleGenerateMusicByStyleAgain = () => {
   if (lastStyle && lastDescription) {
     handleGenerateMusicByStyle(lastStyle, lastDescription);
   } else {
-    alert("먼저 음악을 생성해주세요.");
+    console.log("먼저 음악을 생성해주세요.");
   }
 };
 

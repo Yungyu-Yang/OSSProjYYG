@@ -65,14 +65,14 @@ export default function EditProfile() {
         setCustomModalMessage('회원 정보가 성공적으로 수정되었습니다!');
         setCustomModalOpen(true);
       } else {
-        alert(response.data.header?.resultMsg || '회원 정보 수정에 실패했습니다.');
+        console.log(response.data.header?.resultMsg || '회원 정보 수정에 실패했습니다.');
       }
     } catch (err: any) {
       const resultMsg = err.response?.data?.header?.resultMsg;
       if (resultMsg) {
-        alert(resultMsg);
+        console.log(resultMsg);
       } else {
-        alert('회원 정보 수정 중 오류가 발생했습니다.');
+        console.log('회원 정보 수정 중 오류가 발생했습니다.');
         console.log('회원 정보 수정 오류: ', err);
       }
     } finally {

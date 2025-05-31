@@ -136,10 +136,10 @@ const AvatarGrid: React.FC = () => {
         setCustomModalMessage('아바타가 변경되었습니다!');
         setCustomModalOpen(true);
       } else {
-        alert(response.data.header?.resultMsg || '아바타 변경에 실패했습니다.');
+        console.log(response.data.header?.resultMsg || '아바타 변경에 실패했습니다.');
       }
     } catch (e: any) {
-      alert(e?.response?.data?.header?.resultMsg || '아바타 변경 중 오류가 발생했습니다.');
+      console.log(e?.response?.data?.header?.resultMsg || '아바타 변경 중 오류가 발생했습니다.');
     }
   };
 
