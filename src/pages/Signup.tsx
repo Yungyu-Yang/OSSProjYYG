@@ -38,10 +38,10 @@ export default function SignUp() {
         setCustomModalOpen(true);
         navigate('/signin');
       } else {
-        alert(response.data.header.resultMsg || '회원가입에 실패했습니다.');
+        console.log(response.data.header.resultMsg || '회원가입에 실패했습니다.');
       }
     } catch (error) {
-      alert('회원가입 중 오류가 발생했습니다.');
+      console.log('회원가입 중 오류가 발생했습니다.');
       console.error('회원가입 오류: ', error);
     } finally {
       setLoading(false);
@@ -52,7 +52,7 @@ export default function SignUp() {
   {/* 이름 중복확인 */}
   const handleNameCheck = async () => {
     if (!name) {
-      alert('닉네임을 입력해주세요.');
+      console.log('닉네임을 입력해주세요.');
       return;
     }
     setLoading(true);
@@ -66,7 +66,7 @@ export default function SignUp() {
       );
       const resultCode = response.data.header?.resultCode;
       const resultMsg = response.data.header?.resultMsg;
-      // alert(resultMsg);
+
       if (resultCode === 1000) {
         setIsNameAvailable(true);
       } else {
@@ -75,9 +75,9 @@ export default function SignUp() {
     } catch (error: any) {
       const resultMsg = error.response?.data?.header?.resultMsg;
       if (resultMsg) {
-        alert(resultMsg);
+        console.log(resultMsg);
       } else {
-        alert('닉네임 중복확인 중 오류가 발생했습니다.');
+        console.log('닉네임 중복확인 중 오류가 발생했습니다.');
       }
       setIsNameAvailable(false);
       console.error('닉네임 중복확인 오류: ',error);
@@ -89,7 +89,7 @@ export default function SignUp() {
   {/* 이메일 중복확인 */}
   const handleEmailCheck = async () => {
     if (!email) {
-      alert('이메일을 입력해주세요.');
+      console.log('이메일을 입력해주세요.');
       return;
     }
     setLoading(true);
@@ -103,7 +103,7 @@ export default function SignUp() {
       );
       const resultCode = response.data.header?.resultCode;
       const resultMsg = response.data.header?.resultMsg;
-      // alert(resultMsg);
+
       if (resultCode === 1000) {
         setIsEmailAvailable(true);
       } else {
@@ -112,9 +112,9 @@ export default function SignUp() {
     } catch (error: any) {
       const resultMsg = error.response?.data?.header?.resultMsg;
       if (resultMsg) {
-        alert(resultMsg);
+        console.log(resultMsg);
       } else {
-        alert('이메일 중복확인 중 오류가 발생했습니다.');
+        console.log('이메일 중복확인 중 오류가 발생했습니다.');
       }
       setIsEmailAvailable(false);
       console.error('이메일 중복확인 오류: ',error);

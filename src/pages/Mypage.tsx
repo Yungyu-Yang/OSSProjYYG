@@ -66,14 +66,14 @@ export default function MyPage() {
         setCustomModalOpen(true);
         navigate('/');
       } else {
-        alert(response.data.header?.resultMsg || '회원 탈퇴에 실패하였습니다.');
+        console.log(response.data.header?.resultMsg || '회원 탈퇴에 실패하였습니다.');
       }
     } catch (err: any) {
       const resultMsg = err.response?.data?.header?.resultMsg;
       if (resultMsg) {
-        alert(resultMsg);
+        console.log(resultMsg);
       } else {
-        alert('회원 탈퇴 중 오류가 발생했습니다.');
+        console.log('회원 탈퇴 중 오류가 발생했습니다.');
         console.log('회원 탈퇴 오류: ', err);
       }
     } finally {
