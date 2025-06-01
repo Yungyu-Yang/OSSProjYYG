@@ -135,24 +135,19 @@ const Calendar = () => {
     checkLastDayPassed(month);
   }, []);
 
-
-  // FullCalendar의 month 변경 이벤트 핸들러
-  // const handleDatesSet = (arg: any) => {
-  //   const start = arg.start;
-  //   const month = start.toISOString().slice(0, 7);
-  //   setCurrentMonth(month);
-  //   fetchCalendarData(month);
-  //   fetchMonthlyMusic(month);
-  //   checkLastDayPassed(month);
-  // };
   const handleDatesSet = (arg: any) => {
-    const month = arg.view.currentStart.toISOString().slice(0, 7); 
-    console.log('month : ', month)
-    setCurrentMonth(month);
-    fetchCalendarData(month);
-    fetchMonthlyMusic(month);
-    checkLastDayPassed(month);
+    const startDate = new Date(arg.view.currentStart);
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+    const fixedMonth = `${year}-${month.toString().padStart(2, '0')}`;
+
+    console.log('!!!fixedMonth : ', fixedMonth);
+    setCurrentMonth(fixedMonth);
+    fetchCalendarData(fixedMonth);
+    fetchMonthlyMusic(fixedMonth);
+    checkLastDayPassed(fixedMonth);
   };
+
 
   // 이미지 스타일을 설정하는 함수
   const createImageElement = (src: string, position = 'absolute', width = '30px', height = '30px', top = '0', left = '10px') => {
@@ -239,7 +234,7 @@ const Calendar = () => {
     const token = localStorage.getItem('accessToken');
     try {
       setIsLoadingMusic(true);
-      const res = await axios.post(`${baseURL}/calendar/music/generate`, {}, {
+      const res = await axios.post(`${baseURL}/calendar/music/generate?month=${currentMonth}`, {}, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
