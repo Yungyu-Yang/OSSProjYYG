@@ -47,7 +47,7 @@ public class MusicService {
                 .collect(Collectors.joining("\n"));
 
         String[] command = {
-                "python", "src/main/java/com/skycastle/mindtune/model/function_call.py", "style", chatContents
+                "/opt/venv/bin/python3", "/app/function_call.py", "style", chatContents
         };
 
         String result = runPythonScript(command);
@@ -94,7 +94,7 @@ public class MusicService {
                 .collect(Collectors.joining("\n"));
 
         String[] command = {
-                "python", "src/main/java/com/skycastle/mindtune/model/function_call.py", "daily", chatContents, request.getStyle(), request.getDescription()
+                "/opt/venv/bin/python3", "/app/function_call.py", "daily", chatContents, request.getStyle(), request.getDescription()
         };
 
         String result = runPythonScript(command);
@@ -200,8 +200,7 @@ public class MusicService {
         try {
             // Python 스크립트 실행: prompt를 인자로 전달
             ProcessBuilder pb = new ProcessBuilder(
-                    "python",
-                    "src/main/java/com/skycastle/mindtune/model/generate_music.py",
+                    "/opt/venv/bin/python3", "/app/generate_music.py",
                     prompt
             );
             pb.redirectErrorStream(true);

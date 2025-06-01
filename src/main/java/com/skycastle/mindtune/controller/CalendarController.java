@@ -68,14 +68,15 @@ public class CalendarController {
 
     // 이달의 음악 생성 요청
     @PostMapping("/music/generate")
-    public ResponseEntity<?> generateMonthMusic(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> generateMonthMusic(@RequestHeader("Authorization") String token,
+                                                @RequestParam("month") String month) {
         String jwtToken = token.replace("Bearer ", "");
         if (!jwtTokenProvider.validateToken(jwtToken)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired token");
         }
         Long uno = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        CalendarMusicResponseDTO result = calendarService.generateMonthMusic(uno);
+        CalendarMusicResponseDTO result = calendarService.generateMonthMusic(uno, month);
         BaseResponse<CalendarMusicResponseDTO> response = new BaseResponse<>(1000, "음악이 성공적으로 생성되었습니다.", result);
         return ResponseEntity.ok(response);
     }
