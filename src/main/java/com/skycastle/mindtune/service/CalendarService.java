@@ -124,11 +124,11 @@ public class CalendarService {
     }
 
     // 이달의 음악 생성
-    public CalendarMusicResponseDTO generateMonthMusic(Long uno) {
+    public CalendarMusicResponseDTO generateMonthMusic(Long uno, String month) {
 
-        LocalDate today = LocalDate.now();
-        LocalDate firstDayOfMonth = today.withDayOfMonth(1);
-        LocalDate lastDayOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+        YearMonth yearMonth = YearMonth.parse(month);
+        LocalDate firstDayOfMonth = yearMonth.atDay(1);
+        LocalDate lastDayOfMonth = yearMonth.atEndOfMonth();
         LocalDateTime startOfMonth = firstDayOfMonth.atStartOfDay();
         LocalDateTime endOfMonth = lastDayOfMonth.atTime(LocalTime.MAX);
 
@@ -153,7 +153,7 @@ public class CalendarService {
 
         // 파이썬 스크립트 실행
         String[] command = {
-                "python", "src/main/java/com/skycastle/mindtune/model/function_call.py", "monthly", chatContents
+                "/opt/venv/bin/python3", "/app/function_call.py", "monthly", chatContents
         };
 
         String result = runPythonScript(command);
@@ -175,7 +175,7 @@ public class CalendarService {
                 .uno(uno)
                 .prompt(prompt)
                 .music(musicResult)
-                .createdAt(LocalDateTime.now())
+                .createdAt(startOfMonth)
                 .build();
         monthMusicRepository.save(newMusic);
 
@@ -211,8 +211,7 @@ public class CalendarService {
         try {
             // Python 스크립트 실행: prompt를 인자로 전달
             ProcessBuilder pb = new ProcessBuilder(
-                    "python",
-                    "src/main/java/com/skycastle/mindtune/model/generate_music.py",
+                    "/opt/venv/bin/python3", "/app/generate_music.py",
                     prompt
             );
             pb.redirectErrorStream(true);

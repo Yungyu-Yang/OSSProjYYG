@@ -151,7 +151,7 @@ public class ChatService {
 
     private String generateGPTResponse(String userMessage) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("python", "src/main/java/com/skycastle/mindtune/model/generate_response.py", userMessage);
+            ProcessBuilder pb = new ProcessBuilder("/opt/venv/bin/python3", "/app/generate_response.py", userMessage);
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
@@ -173,9 +173,10 @@ public class ChatService {
         }
     }
 
+
     private String generateGPTVoiceResponse(String convertText) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("python", "src/main/java/com/skycastle/mindtune/model/generate_response.py", convertText);
+            ProcessBuilder pb = new ProcessBuilder("/opt/venv/bin/python3", "/app/generate_response.py", convertText);
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
@@ -286,8 +287,7 @@ public class ChatService {
 
             // 3. stt.py 호출
             ProcessBuilder pb = new ProcessBuilder(
-                    "python",
-                    "src/main/java/com/skycastle/mindtune/model/stt.py",
+                    "/opt/venv/bin/python3", "/app/stt.py",
                     filePathToUse
             );
             pb.redirectErrorStream(true);
