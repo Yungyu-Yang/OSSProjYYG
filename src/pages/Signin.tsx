@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '/assets/etc/logo.png';
 
-export default function SignIn() {
+const SignIn = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -11,45 +11,45 @@ export default function SignIn() {
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const handleLogin = async () => {
-  console.log('📥 로그인 시도:', { email, password }); // 입력값 확인
+    console.log('📥 로그인 시도:', { email, password });
 
-  try {
-    const response = await axios.post(
-      `${baseURL}/user/login`,
-      {
-        email,
-        password,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
+    try {
+      const response = await axios.post(
+        `${baseURL}/user/login`,
+        {
+          email,
+          password,
         },
-        withCredentials: true,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log('✅ 전체 응답:', response);
+      console.log('🔑 응답 헤더:', response.headers);
+      console.log('📦 응답 바디:', response.data);
+
+      const token = response.headers['authorization'];
+      const uno = response.data.body?.uno;
+
+      if (token) {
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('uno', uno);
+        console.log('🧠 저장된 토큰:', token);
+        console.log('🧠 저장된 uno:', uno);
+        navigate('/home');
+      } else {
+        console.log('로그인 실패: 토큰이 없습니다.');
       }
-    );
 
-    console.log('✅ 전체 응답:', response);
-    console.log('🔑 응답 헤더:', response.headers);
-    console.log('📦 응답 바디:', response.data);
-
-    const token = response.headers['authorization'];
-    const uno = response.data.body?.uno;
-
-    if (token) {
-      localStorage.setItem('accessToken', token);
-      localStorage.setItem('uno', uno);
-      console.log('🧠 저장된 토큰:', token);
-      console.log('🧠 저장된 uno:', uno);
-      navigate('/home');
-    } else {
-      console.log('로그인 실패: 토큰이 없습니다.');
+    } catch (error) {
+      console.error('❌ 로그인 오류:', error);
+      console.log('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.');
     }
-
-  } catch (error) {
-    console.error('❌ 로그인 오류:', error);
-    console.log('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.');
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#fffdf8] p-4">
@@ -93,9 +93,16 @@ export default function SignIn() {
         </div>
 
         <div className="text-center text-sm text-[#7C6F62] mt-2">
-          아이디가 없으신가요? <a href="/signup" className="text-[#ffb3ab] font-medium hover:underline">회원가입하러가기</a>
+          아이디가 없으신가요?   
+          <button
+            onClick={() => navigate('/signup')}
+            className="text-[#ffb3ab] font-medium hover:underline ml-1">
+            회원가입하러가기
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SignIn;
