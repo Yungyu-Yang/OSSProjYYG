@@ -2,8 +2,8 @@
 import { Routes, Route } from "react-router-dom";
 import Start from "./pages/Start";
 import Home from "./pages/Home";
-import Signup from "./pages/Signup";
-import Signin from "./pages/Signin";
+import SignUp from "./pages/Signup";
+import SignIn from "./pages/Signin";
 import Chat from "./pages/Chat";
 import Calendar from "./pages/Calendar";
 import Mypage from "./pages/Mypage";
@@ -14,8 +14,8 @@ const AppRoutes = () => (
   <Routes>
     <Route path="/" element={<Start />} />
     <Route path="/home" element={<Home />} />
-    <Route path="/signup" element={<Signup />} />
-    <Route path="/signin" element={<Signin />} />
+    <Route path="/signup" element={<SignUp />} />
+    <Route path="/signin" element={<SignIn />} />
     <Route path="/chat" element={<Chat />} />
     <Route path="/calendar" element={<Calendar />} />
     <Route path="/mypage" element={<Mypage />} />

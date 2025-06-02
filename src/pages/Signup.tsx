@@ -3,7 +3,7 @@ import axios from 'axios';
 import logo from '/assets/etc/logo.png';
 import { useNavigate } from 'react-router-dom';
 
-export default function SignUp() {
+const SignUp = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -11,26 +11,20 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [isNameAvailable, setIsNameAvailable] = useState<null | boolean>(null);
   const [isEmailAvailable, setIsEmailAvailable] = useState<null | boolean>(null);
-  const [loading, setLoading] = useState(false); // 로딩 상태
+  const [loading, setLoading] = useState(false);
   const [customModalOpen, setCustomModalOpen] = useState(false);
   const [customModalMessage, setCustomModalMessage] = useState('');
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-  {/* 회원가입 */}
+  // 회원가입
   const handleSignUp = async () => {
     setLoading(true);
     try {
       const response = await axios.post(
         `${baseURL}/user/signup`,
+        { name, email, password },
         {
-          name,
-          email,
-          password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           withCredentials: true,
         }
       );
@@ -49,8 +43,7 @@ export default function SignUp() {
     }
   };
 
-
-  {/* 이름 중복확인 */}
+  // 이름 중복확인
   const handleNameCheck = async () => {
     if (!name) {
       console.log('닉네임을 입력해주세요.');
@@ -58,35 +51,23 @@ export default function SignUp() {
     }
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${baseURL}/user/checkname`,
-        {
-          params: { name },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get(`${baseURL}/user/checkname`, {
+        params: { name },
+        withCredentials: true,
+      });
       const resultCode = response.data.header?.resultCode;
-
-      if (resultCode === 1000) {
-        setIsNameAvailable(true);
-      } else {
-        setIsNameAvailable(false);
-      }
+      setIsNameAvailable(resultCode === 1000);
     } catch (error: any) {
       const resultMsg = error.response?.data?.header?.resultMsg;
-      if (resultMsg) {
-        console.log(resultMsg);
-      } else {
-        console.log('닉네임 중복확인 중 오류가 발생했습니다.');
-      }
+      console.log(resultMsg || '닉네임 중복확인 중 오류가 발생했습니다.');
       setIsNameAvailable(false);
-      console.error('닉네임 중복확인 오류: ',error);
+      console.error('닉네임 중복확인 오류: ', error);
     } finally {
       setLoading(false);
     }
   };
 
-  {/* 이메일 중복확인 */}
+  // 이메일 중복확인
   const handleEmailCheck = async () => {
     if (!email) {
       console.log('이메일을 입력해주세요.');
@@ -94,29 +75,17 @@ export default function SignUp() {
     }
     setLoading(true);
     try {
-      const response = await axios.get(
-        `${baseURL}/user/checkemail`,
-        {
-          params: { email },
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get(`${baseURL}/user/checkemail`, {
+        params: { email },
+        withCredentials: true,
+      });
       const resultCode = response.data.header?.resultCode;
-
-      if (resultCode === 1000) {
-        setIsEmailAvailable(true);
-      } else {
-        setIsEmailAvailable(false);
-      }
+      setIsEmailAvailable(resultCode === 1000);
     } catch (error: any) {
       const resultMsg = error.response?.data?.header?.resultMsg;
-      if (resultMsg) {
-        console.log(resultMsg);
-      } else {
-        console.log('이메일 중복확인 중 오류가 발생했습니다.');
-      }
+      console.log(resultMsg || '이메일 중복확인 중 오류가 발생했습니다.');
       setIsEmailAvailable(false);
-      console.error('이메일 중복확인 오류: ',error);
+      console.error('이메일 중복확인 오류: ', error);
     } finally {
       setLoading(false);
     }
@@ -145,6 +114,7 @@ export default function SignUp() {
 
       {/* 입력창 */}
       <div className="space-y-4 w-full max-w-sm">
+        {/* 이름 */}
         <div>
           <label htmlFor="name" className="block text-[#4A3F35] mb-1">Name</label>
           <div className="relative">
@@ -159,16 +129,10 @@ export default function SignUp() {
               type="button"
               onClick={handleNameCheck}
               className="absolute top-1/2 right-3 -translate-y-1/2 px-3 py-1 bg-[#ffb3ab] text-white rounded-md text-sm"
-              >중복확인</button>
+            >중복확인</button>
           </div>
-
-          {/* 이름 중복확인 결과 */}
-          {isNameAvailable === true && (
-            <p className="text-green-500 mt-2">사용 가능한 이름입니다!</p>
-          )}
-          {isNameAvailable === false && (
-            <p className="text-red-500 mt-2">이미 사용중인 이름입니다!</p>
-          )}
+          {isNameAvailable === true && <p className="text-green-500 mt-2">사용 가능한 이름입니다!</p>}
+          {isNameAvailable === false && <p className="text-red-500 mt-2">이미 사용중인 이름입니다!</p>}
         </div>
 
         {/* 이메일 */}
@@ -186,15 +150,10 @@ export default function SignUp() {
               type="button"
               onClick={handleEmailCheck}
               className="absolute top-1/2 right-3 -translate-y-1/2 px-3 py-1 bg-[#ffb3ab] text-white rounded-md text-sm"
-              >중복확인</button>
+            >중복확인</button>
           </div>
-          {/* 이메일 중복확인 결과 */}
-          {isEmailAvailable === true && (
-            <p className="text-green-500 mt-2">사용 가능한 이메일입니다!</p>
-          )}
-          {isEmailAvailable === false && (
-            <p className="text-red-500 mt-2">이미 사용중인 이메일입니다!</p>
-          )}
+          {isEmailAvailable === true && <p className="text-green-500 mt-2">사용 가능한 이메일입니다!</p>}
+          {isEmailAvailable === false && <p className="text-red-500 mt-2">이미 사용중인 이메일입니다!</p>}
         </div>
 
         {/* 비밀번호 */}
@@ -219,12 +178,18 @@ export default function SignUp() {
           </button>
         </div>
 
-        {/* 기존 회원 로그인 이동 */}
+        {/* 로그인 이동 */}
         <div className="text-center text-sm text-[#7C6F62] mt-2">
-          아이디가 있으신가요? <a href="/signin" className="text-[#ffb3ab] font-medium hover:underline">로그인하러가기</a>
+          아이디가 있으신가요?   
+          <button
+            onClick={() => navigate('/signin')}
+            className="text-[#ffb3ab] font-medium hover:underline ml-1">
+            로그인하러가기
+          </button>
         </div>
       </div>
     </div>
   );
-}
-  
+};
+
+export default SignUp;
