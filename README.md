@@ -64,8 +64,8 @@
 
 - 상담    
 <p align="center">
-  <img src="./Src/img/MindTune-Chat.png" width="45%"/>
-  <img src="./Src/img/MindTune-Prompt.png" width="45%"/>
+  <img src="./Src/img/MindTune-Chat.png" width="48%"/>
+  <img src="./Src/img/MindTune-Prompt.png" width="48%"/>
 </p>
 텍스트 및 음성 상담, 음악 스타일 지정 (EXPRESSIVE / COUNTER)
 
@@ -75,8 +75,8 @@
 
 - 캘린더 디테일  
 <p align="center">
-  <img src="./Src/img/MindTune-DetailChat.png" width="50%"/>
-  <img src="./Src/img/MindTune-DetailMusic.png" width="50%"/>
+  <img src="./Src/img/MindTune-DetailChat.png" width="48%"/>
+  <img src="./Src/img/MindTune-DetailMusic.png" width="48%"/>
 </p>
 날짜 클릭시 해당 일자의 상담 및 음악 확인
 
