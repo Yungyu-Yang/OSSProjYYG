@@ -18,8 +18,8 @@
 
 ### 1. 개발 목표
 
-- 음성 및 텍스트 기반 상담 제공  
-- 감정 분석을 통한 맞춤형 음악 생성 및 치료
+- 음성 및 텍스트 기반 AI 상담 제공  
+- 감정 분석을 통한 맞춤형 음악 생성 및 감정 케어
 
 ### 2. 설계 및 구현
 
@@ -27,7 +27,9 @@
 - Front-end : Vite + React 기반 SPA, TypeScript, Tailwind CSS, Axios
 - Back-end : Spring Boot, JWT 인증, AI 모델 연동 (Python)
 - DataBase : MySQL (AWS RDS)
-- Deployment : Docker + AWS EC2
+- Deployment : Docker + AWS EC2  
+
+![MindTune ArchitectureDiagram](./Src/img/ArchitectureDiagram.png)
 
 - 유스케이스 다이어그램
 ![MindTune UseCaseDiagram](./Src/img/UseCaseDiagram.png)
@@ -50,7 +52,7 @@
 ![MindTune ERD](./Src/img/ERD.png)
 
 **2-3) 주요 기능 흐름**
-- 메인 플로우차트
+- 메인 플로우차트  
 ![MindTune FlowChart](./Src/img/FlowChart.png)
 
 - 시퀀스 다이어그램
@@ -102,11 +104,11 @@
 
 **최종발표**
 
-[최종보고서](./Doc/3_1_OSSProj_팀번호_팀명_최종보고서.pdf.pdf)  
-[발표자료](./Doc/3_2_OSSProj_팀번호_팀명_최종발표자료.pdf)  
-[회의록](./Doc/3_3_OSSProj_팀번호_팀명_회의록.pdf)
-[제품구성배포운영자료](./Doc/3_4_OSSProj_팀번호_팀명_제품구성배포운영자료.pdf)
-[시연영상](./Doc/3_5_OSSProj_팀번호_팀명_시연동영상.pdf)
+[최종보고서](./Doc/3_1_OSSProj_03_SkyCastle_최종보고서.pdf.pdf)  
+[발표자료](./Doc/3_2_OSSProj_03_SkyCastle_최종발표자료.pdf)  
+[회의록](./Doc/3_3_OSSProj_03_SkyCastle_회의록.pdf)  
+[제품구성배포운영자료](./Doc/3_4_OSSProj_03_SkyCastle_제품구성배포운영자료.pdf)  
+[시연영상](./Doc/3_5_OSSProj_03_SkyCastle_시연동영상.pdf)  
 
 
 ### 7. 이슈 관리
