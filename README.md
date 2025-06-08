@@ -5,8 +5,6 @@
 
 [Back-end Repository](https://github.com/CSID-DGU/2025-1-OSSProj-skycastle-03-Back.git)
 
-[Notion](https://www.notion.so/SKYCASTLE-1b9191254fee80fe8c6feba16872bd80?pvs=4)
-
 ### 0. 팀 구성
 
 | 구분 | 성명   | 역할                | 소속학과      | 연계전공        | 이메일 |
@@ -61,8 +59,23 @@
 ![MindTune calendar_SequenceDiagram](./Src/img/calendar_SequenceDiagram.png)
 
 ### 3. 서비스 구현 결과
+- 시작    
+![MindTune-Start](./Src/img/MindTune-Start.png)
 
-(내용 추가 예정)
+- 상담    
+<p align="center">
+  <img src="./Src/img/MindTune-Chat.png" width="200"/>
+  <img src="./Src/img/MindTune-Prompt.png" width="200"/>
+</p>
+
+- 캘린더    
+![MindTune-Calendar](./Src/img/MindTune-Calendar.png)
+
+- 캘린더 디테일  
+<p align="center">
+  <img src="./Src/img/MindTune-DetailChat.png" width="200"/>
+  <img src="./Src/img/MindTune-DetailMusic.png" width="200"/>
+</p>
 
 ### 4. 기대효과
 
@@ -108,7 +121,7 @@
 [발표자료](./Doc/3_2_OSSProj_03_SkyCastle_최종발표자료.pdf)  
 [회의록](./Doc/3_3_OSSProj_03_SkyCastle_회의록.pdf)  
 [제품구성배포운영자료](./Doc/3_4_OSSProj_03_SkyCastle_제품구성배포운영자료.pdf)  
-[시연영상](./Doc/3_5_OSSProj_03_SkyCastle_시연동영상.pdf)  
+[시연영상](https://youtu.be/SGw4PQ_0HFk)  
 
 
 ### 7. 이슈 관리
