@@ -64,8 +64,8 @@
 
 - 상담    
 <p align="center">
-  <img src="./Src/img/MindTune-Chat.png" width="200"/>
-  <img src="./Src/img/MindTune-Prompt.png" width="200"/>
+  <img src="./Src/img/MindTune-Chat.png" width="45%"/>
+  <img src="./Src/img/MindTune-Prompt.png" width="45%"/>
 </p>
 
 - 캘린더    
@@ -73,8 +73,8 @@
 
 - 캘린더 디테일  
 <p align="center">
-  <img src="./Src/img/MindTune-DetailChat.png" width="200"/>
-  <img src="./Src/img/MindTune-DetailMusic.png" width="200"/>
+  <img src="./Src/img/MindTune-DetailChat.png" width="45%"/>
+  <img src="./Src/img/MindTune-DetailMusic.png" width="45%"/>
 </p>
 
 ### 4. 기대효과
