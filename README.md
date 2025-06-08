@@ -67,15 +67,18 @@
   <img src="./Src/img/MindTune-Chat.png" width="45%"/>
   <img src="./Src/img/MindTune-Prompt.png" width="45%"/>
 </p>
+텍스트 및 음성 상담, 음악 스타일 지정 (EXPRESSIVE / COUNTER)
 
 - 캘린더    
 ![MindTune-Calendar](./Src/img/MindTune-Calendar.png)
+캐릭터 달력 마크 및 이달의 음악 생성 / 재생
 
 - 캘린더 디테일  
 <p align="center">
-  <img src="./Src/img/MindTune-DetailChat.png" width="45%"/>
-  <img src="./Src/img/MindTune-DetailMusic.png" width="45%"/>
+  <img src="./Src/img/MindTune-DetailChat.png" width="50%"/>
+  <img src="./Src/img/MindTune-DetailMusic.png" width="50%"/>
 </p>
+날짜 클릭시 해당 일자의 상담 및 음악 확인
 
 ### 4. 기대효과
 
