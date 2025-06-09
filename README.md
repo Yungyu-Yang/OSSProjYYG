@@ -78,7 +78,7 @@
   <img src="./Src/img/MindTune-DetailChat.png" width="48%"/>
   <img src="./Src/img/MindTune-DetailMusic.png" width="48%"/>
 </p>
-날짜 클릭시 해당 일자의 상담 및 음악 확인
+날짜 클릭시 해당 일자의 상담 및 음악 재생
 
 ### 4. 기대효과
 
@@ -120,7 +120,7 @@
 
 **최종발표**
 
-[최종보고서](./Doc/3_1_OSSProj_03_SkyCastle_최종보고서.pdf.pdf)  
+[최종보고서](./Doc/3_1_OSSProj_03_SkyCastle_최종보고서.pdf)  
 [발표자료](./Doc/3_2_OSSProj_03_SkyCastle_최종발표자료.pdf)  
 [회의록](./Doc/3_3_OSSProj_03_SkyCastle_회의록.pdf)  
 [제품구성배포운영자료](./Doc/3_4_OSSProj_03_SkyCastle_제품구성배포운영자료.pdf)  
