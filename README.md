@@ -1,10 +1,6 @@
 ## 2025-1-OSSProj-skycastle-03
 ![MindTune Intro](./Src/img/Project_Intro.png)
 
-[Front-end Repository](https://github.com/CSID-DGU/2025-1-OSSProj-skycastle-03-Front.git)
-
-[Back-end Repository](https://github.com/CSID-DGU/2025-1-OSSProj-skycastle-03-Back.git)
-
 ### 0. 팀 구성
 
 | 구분 | 성명   | 역할                | 소속학과      | 연계전공        | 이메일 |
@@ -100,7 +96,7 @@
 
 ### 5. 실행 방법
 
-- http://52.78.42.91/ 접속
+- http://52.78.42.91/ 접속 (현재 서버 종료)
 
 ### 6. 자료 관리
 
